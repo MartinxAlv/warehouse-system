@@ -226,6 +226,31 @@ public class SampleDataService {
         // Main:  USB-C=175  HDMI=160  Charger=75(LOW)  Laptop=80  Mouse=120  KB=18(LOW)  Hub=80  Webcam=70  Headset=50  Stand=100
         // East:  USB-C=150  HDMI=150  Mouse=190  KB=100  Webcam=58  Headset=37
         // West:  USB-C=30   Mouse=50  KB=80  Stand=60  Headset=10(LOW)
+
+        // ── Bin locations ─────────────────────────────────────────────────────────
+        setBin(usbC,    main, "Aisle A · Row 1 · Bin 3");
+        setBin(hdmi,    main, "Aisle A · Row 1 · Bin 4");
+        setBin(charger, main, "Aisle B · Row 2 · Bin 1");
+        setBin(laptop,  main, "Aisle B · Row 2 · Bin 2");
+        setBin(mouse,   main, "Aisle C · Row 3 · Bin 5");
+        setBin(kb,      main, "Aisle C · Row 3 · Bin 6");
+        setBin(hub,     main, "Aisle C · Row 1 · Bin 2");
+        setBin(webcam,  main, "Aisle D · Row 1 · Bin 1");
+        setBin(headset, main, "Aisle D · Row 2 · Bin 3");
+        setBin(stand,   main, "Aisle C · Row 3 · Bin 4");
+
+        setBin(usbC,    east, "Aisle A · Row 1 · Bin 1");
+        setBin(hdmi,    east, "Aisle A · Row 1 · Bin 2");
+        setBin(mouse,   east, "Aisle B · Row 1 · Bin 3");
+        setBin(kb,      east, "Aisle B · Row 2 · Bin 1");
+        setBin(webcam,  east, "Aisle C · Row 1 · Bin 4");
+        setBin(headset, east, "Aisle C · Row 2 · Bin 2");
+
+        setBin(usbC,    west, "Aisle A · Row 1 · Bin 1");
+        setBin(mouse,   west, "Aisle A · Row 2 · Bin 3");
+        setBin(kb,      west, "Aisle B · Row 1 · Bin 5");
+        setBin(stand,   west, "Aisle B · Row 2 · Bin 1");
+        setBin(headset, west, "Aisle A · Row 2 · Bin 2");
     }
 
     @Transactional
@@ -295,6 +320,11 @@ public class SampleDataService {
 
     private void pending(String customer, String email, Map<Long, Integer> items) {
         customerOrderService.createOrder(customer, email, items);
+    }
+
+    private void setBin(Product product, Warehouse warehouse, String binLocation) {
+        jdbc.update("UPDATE inventory_items SET bin_location = ? WHERE product_id = ? AND warehouse_id = ?",
+                binLocation, product.getId(), warehouse.getId());
     }
 
     /** Build a product-id → quantity map from alternating Product, int pairs. */

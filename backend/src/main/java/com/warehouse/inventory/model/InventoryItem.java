@@ -29,6 +29,9 @@ public class InventoryItem {
     @Column(nullable = false)
     private int quantityOnHand = 0;
 
+    @Column(length = 100)
+    private String binLocation;
+
     @Transient
     public boolean isLowStock() {
         return product != null && quantityOnHand <= product.getReorderThreshold();

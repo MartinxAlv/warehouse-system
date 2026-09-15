@@ -1603,6 +1603,167 @@ tbody tr:hover { background: #fafbff; }
 .sidebar--collapsed .sidebar-user-info { flex: 0 0 auto; gap: 0; }
 .sidebar--collapsed .sidebar-logout { display: none; }
 
+/* ─── Bin Location Cell ──────────────────────────────────────────────── */
+.bin-location-cell {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--text-2);
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-family: inherit;
+  transition: background 0.12s;
+  text-align: left;
+}
+
+.bin-location-cell:hover { background: var(--border-lt); }
+.bin-location-cell:hover .bin-edit-icon { opacity: 1; }
+
+.bin-edit-icon {
+  opacity: 0;
+  color: var(--muted);
+  transition: opacity 0.12s;
+  flex-shrink: 0;
+}
+
+.bin-unset {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 12px;
+}
+
+/* ─── Product Label ──────────────────────────────────────────────────── */
+.label-preview {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 8px;
+}
+
+.label-card {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  width: 340px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.label-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.label-brand-mark {
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.label-brand-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.03em;
+}
+
+.label-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 14px;
+}
+
+.label-qr {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.label-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label-product-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.label-sku {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-xl);
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.label-bin {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+
+.label-bin--unset {
+  color: var(--muted);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.label-warehouse {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ─── Print styles ───────────────────────────────────────────────────── */
+@media print {
+  body * { visibility: hidden; }
+  .label-card, .label-card * { visibility: visible; }
+  .label-card {
+    position: fixed;
+    top: 20mm;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80mm;
+    border: 1px solid #ccc;
+    box-shadow: none;
+  }
+  .label-header { background: #0f172a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .label-sku { background: #e0e7ff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .label-qr { background: #fff !important; }
+}
+
 /* ─── Profile Role Tag ───────────────────────────────────────────────── */
 .profile-role-tag {
   display: inline-flex;

@@ -70,6 +70,7 @@ export const api = {
   getLowStock: () => request('/inventory/low-stock'),
   adjustStock: (data) => request('/inventory/adjust', { method: 'POST', body: JSON.stringify(data) }),
   transferStock: (data) => request('/inventory/transfer', { method: 'POST', body: JSON.stringify(data) }),
+  updateBinLocation: (id, binLocation) => request(`/inventory/${id}/location`, { method: 'PATCH', body: JSON.stringify({ binLocation }) }),
   getMovements: (params = {}) => {
     const qs = new URLSearchParams(params).toString();
     return request(`/inventory/movements${qs ? `?${qs}` : ''}`);

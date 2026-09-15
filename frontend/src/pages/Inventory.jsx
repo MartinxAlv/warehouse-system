@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client.js'
 import Modal from '../components/Modal.jsx'
+import ProductLabel from '../components/ProductLabel.jsx'
+import Icon from '../components/Icon.jsx'
 import { useToast } from '../context/ToastContext.jsx'
 
 const REASONS = ['Damaged', 'Recount', 'Return', 'Theft', 'Expired', 'Restocked', 'Other']
@@ -14,6 +16,9 @@ export default function Inventory() {
   const [adjustForm, setAdjustForm] = useState({ delta: '', reason: '' })
   const [showTransfer, setShowTransfer] = useState(false)
   const [transferForm, setTransferForm] = useState({ productId: '', fromWarehouseId: '', toWarehouseId: '', quantity: '' })
+  const [locationTarget, setLocationTarget] = useState(null)
+  const [locationValue, setLocationValue] = useState('')
+  const [labelTarget, setLabelTarget] = useState(null)
 
   const products = [...new Map(items.map((i) => [i.product.id, i.product])).values()]
 
@@ -55,6 +60,21 @@ export default function Inventory() {
     } catch (err) { setError(err.message) }
   }
 
+  async function submitLocation(e) {
+    e.preventDefault()
+    try {
+      await api.updateBinLocation(locationTarget.id, locationValue.trim())
+      toast('Bin location updated')
+      setLocationTarget(null)
+      load()
+    } catch (err) { setError(err.message) }
+  }
+
+  function openLocation(item) {
+    setLocationTarget(item)
+    setLocationValue(item.binLocation || '')
+  }
+
   return (
     <div>
       <div className="page-header">
@@ -62,16 +82,25 @@ export default function Inventory() {
           <h1>Inventory</h1>
           <p className="muted small">{items.length} inventory line{items.length !== 1 ? 's' : ''}</p>
         </div>
-        <button className="btn-secondary" title="Move stock from one warehouse to another" onClick={() => setShowTransfer(true)}>Transfer Stock</button>
+        <button className="btn-secondary" onClick={() => setShowTransfer(true)}>Transfer Stock</button>
       </div>
       {error && <div className="error-banner">{error}</div>}
 
       <table>
         <thead>
-          <tr><th>Product</th><th>Warehouse</th><th>Qty on Hand</th><th>Status</th><th></th></tr>
+          <tr>
+            <th>Product</th>
+            <th>Warehouse</th>
+            <th>Bin Location</th>
+            <th>Qty on Hand</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
         </thead>
         <tbody>
-          {items.length === 0 && <tr><td colSpan={5} className="empty-state">No inventory yet. Receive a purchase order to add stock.</td></tr>}
+          {items.length === 0 && (
+            <tr><td colSpan={6} className="empty-state">No inventory yet. Receive a purchase order to add stock.</td></tr>
+          )}
           {items.map((i) => {
             const low = i.quantityOnHand <= (i.product?.reorderThreshold ?? 0)
             const out = i.quantityOnHand === 0
@@ -79,6 +108,15 @@ export default function Inventory() {
               <tr key={i.id}>
                 <td style={{ fontWeight: 500, color: 'var(--text)' }}>{i.product?.name}</td>
                 <td>{i.warehouse?.name}</td>
+                <td>
+                  <button className="bin-location-cell" onClick={() => openLocation(i)} title="Edit bin location">
+                    {i.binLocation
+                      ? <><Icon name="mapPin" size={12} /><span>{i.binLocation}</span></>
+                      : <span className="bin-unset">Set location</span>
+                    }
+                    <Icon name="edit" size={11} className="bin-edit-icon" />
+                  </button>
+                </td>
                 <td style={{ fontWeight: 600 }}>{i.quantityOnHand}</td>
                 <td>
                   <span className={`badge badge-${out ? 'red' : low ? 'amber' : 'green'}`}>
@@ -86,7 +124,12 @@ export default function Inventory() {
                   </span>
                 </td>
                 <td>
-                  <button className="link-btn" title="Manually adjust the stock quantity" onClick={() => setAdjustTarget(i)}>Adjust</button>
+                  <div className="row-actions">
+                    <button className="link-btn" onClick={() => setAdjustTarget(i)}>Adjust</button>
+                    <button className="link-btn" onClick={() => setLabelTarget(i)} title="Print product label">
+                      <Icon name="printer" size={13} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             )
@@ -133,6 +176,31 @@ export default function Inventory() {
         </Modal>
       )}
 
+      {locationTarget && (
+        <Modal title="Set Bin Location" onClose={() => setLocationTarget(null)}>
+          <form onSubmit={submitLocation} className="stacked-form">
+            <div className="adjust-info" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+              <strong style={{ color: 'var(--text)' }}>{locationTarget.product?.name}</strong>
+              <span className="muted small">{locationTarget.warehouse?.name}</span>
+            </div>
+            <label>
+              Bin Location
+              <input
+                autoFocus
+                placeholder="e.g. Aisle A · Row 1 · Bin 3"
+                value={locationValue}
+                onChange={(e) => setLocationValue(e.target.value)}
+              />
+              <span className="field-hint">Free-form label — use whatever format your warehouse uses</span>
+            </label>
+            <div className="form-actions">
+              <button type="button" className="btn-secondary" onClick={() => setLocationTarget(null)}>Cancel</button>
+              <button className="btn-primary" type="submit">Save Location</button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
       {showTransfer && (
         <Modal title="Transfer Stock Between Warehouses" onClose={() => setShowTransfer(false)}>
           <form onSubmit={submitTransfer} className="stacked-form">
@@ -163,6 +231,10 @@ export default function Inventory() {
             </div>
           </form>
         </Modal>
+      )}
+
+      {labelTarget && (
+        <ProductLabel item={labelTarget} onClose={() => setLabelTarget(null)} />
       )}
     </div>
   )

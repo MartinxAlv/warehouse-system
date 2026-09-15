@@ -54,6 +54,14 @@ public class InventoryController {
         inventoryService.transferStock(productId, fromWarehouseId, toWarehouseId, quantity);
     }
 
+    @PatchMapping("/{id}/location")
+    public InventoryItem updateLocation(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        InventoryItem item = inventoryItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Inventory item not found: " + id));
+        item.setBinLocation(body.get("binLocation"));
+        return inventoryItemRepository.save(item);
+    }
+
     @GetMapping("/movements")
     public List<StockMovement> getMovements(@RequestParam(required = false) Long productId,
                                              @RequestParam(required = false) Long warehouseId) {
