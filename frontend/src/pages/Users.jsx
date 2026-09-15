@@ -19,6 +19,9 @@ export default function Users() {
   const [confirmTarget, setConfirmTarget] = useState(null)
   const [createForm, setCreateForm] = useState(EMPTY_CREATE)
   const [editForm, setEditForm] = useState({ fullName: '', role: '', active: true, password: '' })
+  const [dataLoaded, setDataLoaded] = useState(false)
+  const [showClearConfirm, setShowClearConfirm] = useState(false)
+  const [toolWorking, setToolWorking] = useState(false)
 
   function load() {
     setLoading(true)
@@ -28,7 +31,13 @@ export default function Users() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(load, [])
+  function loadStatus() {
+    api.getSampleDataStatus()
+      .then((res) => setDataLoaded(res.loaded))
+      .catch(() => {})
+  }
+
+  useEffect(() => { load(); loadStatus() }, [])
 
   async function handleCreate(e) {
     e.preventDefault()
@@ -59,6 +68,34 @@ export default function Users() {
       load()
     } catch (err) {
       setError(err.message)
+    }
+  }
+
+  async function handleSeed() {
+    setToolWorking(true)
+    try {
+      await api.seedSampleData()
+      toast('Sample data loaded — 5 products, 3 purchase orders, 5 customer orders created')
+      setDataLoaded(true)
+      load()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setToolWorking(false)
+    }
+  }
+
+  async function handleClear() {
+    setToolWorking(true)
+    try {
+      await api.clearAllData()
+      toast('All data cleared — demo accounts kept', 'info')
+      setDataLoaded(false)
+      load()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setToolWorking(false)
     }
   }
 
@@ -201,6 +238,67 @@ export default function Users() {
           danger
           onConfirm={() => handleDeactivate(confirmTarget)}
           onClose={() => setConfirmTarget(null)}
+        />
+      )}
+
+      {/* ── Admin Tools ────────────────────────────────────────────────── */}
+      <div className="admin-tools panel">
+        <div className="admin-tools-header">
+          <div>
+            <h2>Admin Tools</h2>
+            <p className="muted small">Manage demo data for presentations and testing.</p>
+          </div>
+          <span className={`badge ${dataLoaded ? 'badge-green' : 'badge-gray'}`}>
+            {dataLoaded ? 'Data loaded' : 'Empty'}
+          </span>
+        </div>
+
+        <div className="admin-tool-row">
+          <div className="admin-tool-info">
+            <strong>Load Sample Data</strong>
+            <p className="muted small">
+              Creates 2 categories, 2 suppliers, 2 warehouses, 5 products, 3 purchase orders
+              (received), and 5 customer orders in various states — plus stock adjustments and
+              a full movement log.
+            </p>
+          </div>
+          <button
+            className="btn-primary"
+            disabled={dataLoaded || toolWorking}
+            title={dataLoaded ? 'Clear existing data first' : 'Load a realistic demo dataset'}
+            onClick={handleSeed}
+          >
+            {toolWorking ? 'Loading…' : 'Load Sample Data'}
+          </button>
+        </div>
+
+        <div className="admin-tool-row admin-tool-row--danger">
+          <div className="admin-tool-info">
+            <strong>Clear All Data</strong>
+            <p className="muted small">
+              Permanently deletes all products, orders, inventory, suppliers, warehouses, and
+              categories. The three demo user accounts (admin, staff, sales) are kept.
+            </p>
+          </div>
+          <button
+            className="btn-danger"
+            disabled={toolWorking}
+            title="Delete all data — cannot be undone"
+            onClick={() => setShowClearConfirm(true)}
+          >
+            Clear All Data
+          </button>
+        </div>
+      </div>
+
+      {showClearConfirm && (
+        <ConfirmModal
+          title="Clear All Data"
+          message="This will permanently delete all products, orders, inventory, suppliers, warehouses, and categories. The three demo accounts will be kept. This cannot be undone."
+          confirmLabel="Clear Everything"
+          danger
+          onConfirm={handleClear}
+          onClose={() => setShowClearConfirm(false)}
         />
       )}
     </div>

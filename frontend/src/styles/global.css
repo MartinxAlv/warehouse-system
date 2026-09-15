@@ -1414,3 +1414,56 @@ tbody tr:hover { background: #fafbff; }
   padding: 0 20px 16px;
   background: #fafbff;
 }
+
+/* ─── Admin Tools ────────────────────────────────────────────────────── */
+.admin-tools {
+  margin-top: 32px;
+}
+
+.admin-tools h2 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.admin-tools-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.admin-tool-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+
+.admin-tool-row--danger {
+  border-top: 1px solid var(--red-bg);
+  background: #fff8f8;
+  margin: 0 -24px -24px;
+  padding: 16px 24px;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.admin-tool-info {
+  flex: 1;
+}
+
+.admin-tool-info strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.admin-tool-info p {
+  max-width: 500px;
+  line-height: 1.5;
+}

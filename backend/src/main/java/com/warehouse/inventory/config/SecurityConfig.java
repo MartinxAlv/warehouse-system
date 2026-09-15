@@ -60,8 +60,9 @@ public class SecurityConfig {
                 // Public: login
                 .requestMatchers("/api/auth/**").permitAll()
 
-                // Admin-only: user management
+                // Admin-only: user management and admin tools
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                 // Admin-only: create/modify master data
                 .requestMatchers(HttpMethod.POST,   "/api/categories/**").hasRole("ADMIN")

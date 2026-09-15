@@ -83,6 +83,11 @@ export const api = {
   receivePurchaseOrder: (id, data) => request(`/purchase-orders/${id}/receive`, { method: 'POST', body: JSON.stringify(data) }),
   cancelPurchaseOrder: (id) => request(`/purchase-orders/${id}/cancel`, { method: 'POST' }),
 
+  // admin tools (admin only)
+  getSampleDataStatus: () => request('/admin/sample-data/status'),
+  seedSampleData: () => request('/admin/sample-data/seed', { method: 'POST' }),
+  clearAllData: () => request('/admin/sample-data/clear', { method: 'DELETE' }),
+
   // customer orders
   getOrders: () => request('/orders'),
   getOrder: (id) => request(`/orders/${id}`),

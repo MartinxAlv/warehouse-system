@@ -183,6 +183,41 @@ Open **http://localhost:5173** in your browser. Use one of the demo accounts:
 
 ---
 
+## Sample Data
+
+The system ships with a one-click sample dataset that creates a realistic business scenario so you can demo the full workflow immediately — no manual data entry needed.
+
+### How to load it
+
+1. Log in as **Admin** (`admin@warehouse.com` / `admin123`)
+2. Go to **User Management** (sidebar)
+3. Scroll to the **Admin Tools** panel at the bottom
+4. Click **Load Sample Data**
+
+The page shows a green **Data loaded** badge when data is present, and a grey **Empty** badge when the system is clean.
+
+### What gets created
+
+| Type | Records |
+|---|---|
+| Categories | Electronics, Accessories |
+| Suppliers | AsiaLink Electronics, SwiftParts Co. |
+| Warehouses | Main Warehouse (Chicago), East Coast Hub (New York) |
+| Products | USB-C Cable 2m, 65W GaN Charger, Wireless Mouse, Laptop Stand, HDMI Cable 3m |
+| Purchase Orders | 3 — all received (stock already in inventory) |
+| Customer Orders | 5 — Fulfilled ×2, Confirmed ×1, Pending ×1, Cancelled ×1 |
+| Stock Movements | Full log from all PO receipts, sales, and 2 manual adjustments |
+
+The data is intentionally designed to trigger **low-stock alerts** on two inventory lines (East Coast Hub Charger and Mouse), so the dashboard and reports pages show realistic warnings straight away.
+
+### How to clear it
+
+Click **Clear All Data** in the same Admin Tools panel. This permanently deletes all products, orders, inventory, suppliers, warehouses, categories, and non-demo users. The three demo accounts (admin, staff, sales) are always preserved.
+
+You can load the sample data again immediately after clearing.
+
+---
+
 ## Demo Walkthrough
 
 Follow these steps to see the full system workflow after logging in as **Admin**:
