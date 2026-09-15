@@ -75,7 +75,7 @@ export default function Users() {
     setToolWorking(true)
     try {
       await api.seedSampleData()
-      toast('Sample data loaded — 5 products, 3 purchase orders, 5 customer orders created')
+      toast('Sample data loaded — 10 products, 9 purchase orders, 15 customer orders, bin locations set')
       setDataLoaded(true)
       load()
     } catch (err) {
@@ -257,9 +257,9 @@ export default function Users() {
           <div className="admin-tool-info">
             <strong>Load Sample Data</strong>
             <p className="muted small">
-              Creates 2 categories, 2 suppliers, 2 warehouses, 5 products, 3 purchase orders
-              (received), and 5 customer orders in various states — plus stock adjustments and
-              a full movement log.
+              Creates 4 categories, 3 suppliers, 3 warehouses, 10 products, 9 purchase orders,
+              and 15 customer orders in various states — plus stock adjustments, warehouse transfers,
+              a full movement log, and bin locations for every inventory item.
             </p>
           </div>
           <button
