@@ -136,55 +136,120 @@ warehouse-system/
 
 ## How to Run
 
-### 1. Start MySQL
+The system has three components that must all be running at the same time:
 
-Make sure MySQL is running on `localhost:3306`.
+| Component | Runs on | What it does |
+|---|---|---|
+| MySQL | `localhost:3306` | Stores all data |
+| Spring Boot backend | `http://localhost:8080` | REST API + business logic |
+| React frontend (Vite) | `http://localhost:5173` | The browser UI |
 
+You will need **three terminal windows** (or tabs) — one for the backend and one for the frontend. MySQL runs in the background.
+
+---
+
+### Step 1 — Start MySQL
+
+MySQL must be running before the backend can start.
+
+**macOS (Homebrew):**
 ```bash
-# macOS (Homebrew)
 brew services start mysql
+```
 
-# Windows / Linux
+**Linux:**
+```bash
 sudo systemctl start mysql
 ```
 
-The app will **automatically create the database and all tables** on first run — no SQL scripts needed.
+**Windows:**
+Open the Start Menu, search for **"Services"**, find **MySQL**, and click **Start**. Or via Command Prompt (run as Administrator):
+```cmd
+net start mysql
+```
 
-### 2. Configure the Database
+To verify MySQL is running:
+```bash
+mysql -u root -p -e "SELECT 1;"
+# Should print a result row — if it hangs or errors, MySQL is not running
+```
 
-Open `backend/src/main/resources/application.yml` and update the credentials to match your local MySQL:
+> The app will **automatically create the `warehouse_inventory` database and all tables** on first run — no SQL scripts needed.
+
+---
+
+### Step 2 — Configure Database Credentials
+
+Open [backend/src/main/resources/application.yml](backend/src/main/resources/application.yml) and update the username and password to match your local MySQL setup:
 
 ```yaml
 spring:
   datasource:
+    url: jdbc:mysql://localhost:3306/warehouse_inventory?createDatabaseIfNotExist=true
     username: root
-    password: ""      # Leave blank if no password (Homebrew default)
+    password: ""        # Leave blank if no password set (Homebrew default)
 ```
 
-### 3. Start the Backend
+> If you installed MySQL with a password, enter it here. If you're unsure, try leaving it blank first.
+
+---
+
+### Step 3 — Start the Backend
+
+Open a terminal in the project root and run:
 
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
-The backend starts on **http://localhost:8080**. On first boot, three demo user accounts are automatically created.
+Wait until you see a line like:
+```
+Started InventoryApplication in 4.2 seconds
+```
 
-### 4. Start the Frontend
+The backend is now running at **http://localhost:8080**. On first boot it automatically creates three demo user accounts.
 
-Open a second terminal:
+> If you see `Port 8080 was already in use`, something else is on that port. Find and stop it:
+> ```bash
+> # macOS / Linux
+> lsof -i :8080
+> kill -9 <PID>
+>
+> # Windows
+> netstat -ano | findstr :8080
+> taskkill /PID <PID> /F
+> ```
+
+---
+
+### Step 4 — Start the Frontend
+
+Open a **second terminal** in the project root and run:
 
 ```bash
 cd frontend
-npm install
+npm install       # Only needed the first time (installs dependencies)
 npm run dev
 ```
 
-The frontend starts on **http://localhost:5173**.
+Wait until you see:
+```
+  VITE ready in Xms
+  ➜  Local: http://localhost:5173/
+```
 
-### 5. Log In
+The frontend is now running at **http://localhost:5173**.
 
-Open **http://localhost:5173** and sign in with a demo account:
+> `npm install` only needs to be run once (or again after pulling new changes that update `package.json`).
+
+> If port 5173 is in use, Vite will automatically try 5174, 5175, etc. — check the terminal output for the actual URL.
+
+---
+
+### Step 5 — Open the App
+
+Open **http://localhost:5173** in your browser and sign in with a demo account:
 
 | Role | Email | Password |
 |---|---|---|
@@ -354,9 +419,51 @@ All endpoints are under `http://localhost:8080/api/`. Protected endpoints requir
 
 ## Stopping the Application
 
+### Stop the frontend and backend
+
+Press `Ctrl+C` in each terminal window (the one running the backend, and the one running the frontend). That's all that's needed for normal use.
+
+To kill both at once from a third terminal:
+
 ```bash
-# Ctrl+C in each terminal, or kill both at once:
-pkill -f "spring-boot:run"; pkill -f "vite"
+# macOS / Linux
+pkill -f "spring-boot:run"
+pkill -f "vite"
+
+# Windows (Command Prompt)
+taskkill /IM java.exe /F
+taskkill /IM node.exe /F
+```
+
+### Stop MySQL
+
+You only need to stop MySQL if you want to free up resources or shut down your machine cleanly.
+
+**macOS (Homebrew):**
+```bash
+brew services stop mysql
+```
+
+**Linux:**
+```bash
+sudo systemctl stop mysql
+```
+
+**Windows:**
+```cmd
+net stop mysql
+```
+
+### Check nothing is still running
+
+```bash
+# Check if backend port is still occupied
+lsof -i :8080      # macOS / Linux
+netstat -ano | findstr :8080    # Windows
+
+# Check if frontend port is still occupied
+lsof -i :5173      # macOS / Linux
+netstat -ano | findstr :5173    # Windows
 ```
 
 ---

@@ -1,4 +1,4 @@
-# Warehouse / eCommerce Inventory Management System
+# Stockwell — Warehouse Management System
 
 ## 1. Problem Domain Description
 
@@ -15,6 +15,8 @@ This system gives a small business one place to manage:
 - **Warehouses / storage locations** where stock physically sits
 - **Inventory levels** per product per warehouse, updated automatically whenever stock
   moves in or out
+- **Bin locations** — the physical shelf address of each product within a warehouse
+  (e.g. "Aisle A · Row 1 · Bin 3"), so warehouse staff can find and pick items quickly
 - **Purchase orders** placed with suppliers to restock
 - **Customer orders** (the eCommerce side) that consume stock when fulfilled
 - **Stock movement history** — a full audit trail of every unit that entered or left
@@ -63,6 +65,8 @@ the Java layer is responsible for enforcing.
 - FR14: The system shall allow Warehouse Staff to record manual stock adjustments (damage, loss, correction) with a required reason code.
 - FR15: The system shall allow stock transfers between two warehouses, decrementing one and incrementing the other atomically.
 - FR16: The system shall flag products that fall below their defined reorder threshold.
+- FR16b: The system shall allow Warehouse Staff to record a bin location (physical shelf address) per inventory line, and update it at any time.
+- FR16c: The system shall allow a printable QR product label to be generated for any inventory item, showing the product name, SKU, bin location, warehouse, and a QR code encoding the SKU.
 
 ### 3.5 Purchase Orders (restocking from suppliers)
 - FR17: The system shall allow Warehouse/Admin staff to create a purchase order for one or more products from a supplier.

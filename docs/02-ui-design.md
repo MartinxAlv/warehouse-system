@@ -3,70 +3,138 @@
 ## Navigation Structure
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  LOGO   Dashboard  Products  Inventory  Orders  Suppliers    │   <- Top Nav
-│                                          Users   [👤 Admin ▾] │
-├───────────┬─────────────────────────────────────────────────┤
-│  Sidebar  │                                                  │
-│  (context │                Main Content Area                 │
-│  filters) │                                                  │
-│           │                                                  │
-└───────────┴─────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│  ▐▐▐  Stockwell    │                                      │
+│  ─────────────     │                                      │
+│  Navigation        │         Main Content Area            │
+│  > Dashboard       │                                      │
+│  > Products        │                                      │
+│  > Inventory       │                                      │
+│  > Stock Log       │                                      │
+│  > Purchase Orders │                                      │
+│  > Customer Orders │                                      │
+│  > Suppliers       │                                      │
+│  > Warehouses      │                                      │
+│  > Reports         │                                      │
+│  > Categories*     │                                      │
+│  > Users*          │                                      │
+│  ─────────────     │                                      │
+│  [A] Admin    ↩    │                                      │
+└──────────────────────────────────────────────────────────┘
+  * Admin only
 ```
 
-All authenticated pages share this shell: a top nav bar for primary navigation + user
-menu, and a main content area. Some pages (Products, Inventory) add a left filter
-sidebar.
+All authenticated pages share this shell: a fixed left sidebar for navigation, and a
+main content area that scrolls independently. The sidebar collapses to icon-only mode
+to maximise screen space.
+
+## Sidebar Behaviour
+
+- Expanded (default): shows brand mark + "Stockwell", section label, nav item icons +
+  labels, user avatar + name + role badge + sign-out button.
+- Collapsed: hides all text labels; shows only icons centred in the 60px rail. The
+  brand mark stays visible. The user avatar is centred; the sign-out button is hidden
+  (accessible from Profile instead).
+- Collapse toggle: chevron button at the top-right of the brand area.
+- Preference is saved in `localStorage` and restored on next load.
+- Smooth width transition via CSS variable `--sidebar-width`.
 
 ## Screens
 
 ### 1. Login
-- Email/username + password fields, "Sign in" button, error banner on failure.
+- Brand mark + "Stockwell" title centred above the form.
+- Email + password fields, "Sign in" button, error banner on failure.
+- Three one-click demo account buttons (Admin, Warehouse Staff, Sales Staff) that
+  pre-fill the form — for easy demoing.
 
 ### 2. Dashboard (landing page after login)
-- **KPI cards** across the top: Total Products, Low Stock Items, Pending Purchase
-  Orders, Orders Today.
-- **Low Stock Alert table**: product, current qty, reorder threshold, warehouse — with
-  a "Create Purchase Order" quick action.
-- **Recent Activity feed**: latest stock movements and order status changes.
+- Personalised welcome banner ("Good morning, Alex") using the logged-in user's name
+  and time of day.
+- **KPI cards** across the top: Total Inventory Lines, Total Units in Stock, Low Stock
+  Items, Total Customer Orders.
+- **Low Stock Alert table**: product, current qty, reorder threshold, warehouse.
+- **Recent Activity feed**: latest stock movements (type, product, qty, timestamp).
 
 ### 3. Products
-- Table view: SKU, Name, Category, Price, Total Stock, Status, actions (Edit/Deactivate).
-- Search bar + filters (category, stock status) in left sidebar.
-- "Add Product" opens a modal/form: name, SKU, category dropdown, price, description,
-  reorder threshold, supplier(s).
-- Clicking a product opens a **Product Detail** page showing per-warehouse stock
-  breakdown and its movement history.
+- Table: SKU, Name, Category, Price, Status (Active/Inactive), actions (Edit).
+- Search bar filters by name, SKU, or category inline.
+- "Add Product" opens a modal: name, SKU, category dropdown, price, description,
+  reorder threshold.
 
 ### 4. Inventory
-- Table: Product, Warehouse, Quantity on Hand, Reorder Threshold, Status (OK/Low/Out).
-- Actions: "Adjust Stock" (opens modal: +/- quantity, reason code, notes) and
-  "Transfer Stock" (opens modal: from warehouse, to warehouse, quantity).
-- Filter sidebar by warehouse and stock status.
+- Table: Product, Warehouse, **Bin Location**, Quantity on Hand, Status (OK/Low/Out),
+  Actions.
+- **Bin Location cell**: shows the bin address with a map-pin icon; clicking it opens
+  an inline edit modal to update the text. Unset locations show "Set location" in muted
+  text.
+- **Actions per row**: "Adjust" (opens stock adjustment modal) + printer icon button
+  that opens the **QR Product Label** modal.
+- Transfer Stock button in page header opens a modal: product, from-warehouse,
+  to-warehouse, quantity.
 
-### 5. Purchase Orders
-- List view with status badges (Draft/Submitted/Partially Received/Received/Cancelled).
-- "New Purchase Order" form: pick supplier, add line items (product + quantity + unit
+### 5. QR Product Label (modal, printable)
+- Opens from the printer icon on any Inventory row.
+- Shows a preview label card: brand mark + "Stockwell" header, QR code (encodes the
+  product SKU), product name, SKU chip, bin location, warehouse name.
+- "Print Label" button triggers `window.print()` — a `@media print` rule hides
+  everything except the label card so it prints cleanly at sticker size.
+
+### 6. Stock Movement Log
+- Full audit table: Movement Type, Product, Warehouse, Qty Change, Reason, Reference
+  (order ID), Timestamp.
+- Read-only — no actions. Every stock change in the system appears here.
+
+### 7. Purchase Orders
+- List view with status badges (Draft / Submitted / Received / Cancelled).
+- "New Purchase Order" modal: pick supplier, add line items (product + qty + unit
   cost), submit.
-- Detail page: line items with received-quantity input per line, "Receive Shipment"
-  action that updates inventory.
+- Expand a row to see line items and status action buttons. Buttons are disabled/
+  greyed out when not applicable to the current status.
 
-### 6. Customer Orders
-- List view with status badges (Pending/Confirmed/Fulfilled/Cancelled).
-- "New Order" form: customer info, add line items (product + quantity), live stock
-  availability check per line.
-- Detail page: line items, status timeline, "Fulfill Order" / "Cancel Order" actions.
+### 8. Customer Orders
+- List view with status badges (Pending / Confirmed / Fulfilled / Cancelled).
+- "New Order" modal: customer name + email, add line items (product + qty).
+- Expand a row to see line items, totals, and status action buttons.
 
-### 7. Suppliers & Warehouses (Admin)
-- Simple CRUD table views, same pattern as Products.
+### 9. Suppliers
+- Table: Name, Email, Phone, Address, Status. Edit modal per row.
 
-### 8. Users (Admin only)
-- CRUD table: name, email, role, active status.
+### 10. Warehouses
+- Cards per warehouse showing name and address.
+- Expanding a card shows a live inventory breakdown: product, qty, status badge.
 
-## Visual/Interaction Notes
-- Status is always shown as a colored badge (green = OK/Received/Fulfilled, amber =
-  Low/Pending/Submitted, red = Out of stock/Cancelled).
-- Every destructive action (deactivate, cancel order) requires a confirm dialog.
-- Tables are paginated and sortable by column header click.
+### 11. Reports
+- KPI summary row (same as Dashboard).
+- Stock levels bar chart per product, colour-coded by health (green / amber / red).
+- Purchase order status doughnut chart.
+- Customer order status doughnut chart.
+- Order value summary panel.
+
+### 12. Categories (Admin only)
+- Table: Name, Description. Add / Edit modal.
+
+### 13. Users (Admin only)
+- Table: Name, Email, Role badge, Active status. Add / Edit / Deactivate per row.
+- **Admin Tools** panel at the bottom: Load Sample Data / Clear All Data buttons with
+  a status badge showing whether sample data is currently loaded.
+
+### 14. Profile (all users)
+- **Account Information** panel: full name, email, role badge.
+- **Change Password** panel: current password + new password form.
+- **Appearance** panel: Dark Mode toggle button (On / Off). Preference saved in
+  `localStorage` and applied via `data-theme="dark"` on `<html>`.
+
+## Visual / Interaction Notes
+
+- Status is always shown as a coloured badge (green = OK / Received / Fulfilled,
+  amber = Low / Pending / Submitted, red = Out of Stock / Cancelled).
+- Every destructive action (deactivate user, cancel order, clear data) requires a
+  confirm dialog.
+- Toast notifications appear bottom-right on successful create / update / delete.
+- Tables use zebra striping (alternating row tint) for easier scanning.
+- Every action button has a `title` tooltip.
 - Forms validate client-side (required fields, numeric ranges) and surface server
-  validation errors inline under the relevant field.
+  errors inline.
+- **Dark mode**: full dark colour scheme toggled from Profile → Appearance. All
+  panels, tables, modals, inputs, badges, and the sidebar adapt via CSS custom
+  property overrides under `[data-theme="dark"]`.

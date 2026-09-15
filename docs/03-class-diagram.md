@@ -67,6 +67,7 @@ classDiagram
         -Product product
         -Warehouse warehouse
         -int quantityOnHand
+        -String binLocation
         +isLowStock() boolean
     }
 
