@@ -180,15 +180,18 @@ mysql -u root -p -e "SELECT 1;"
 
 ### Step 2 — Configure Database Credentials
 
-Open [backend/src/main/resources/application.yml](backend/src/main/resources/application.yml) and update the username and password to match your local MySQL setup:
+Open [backend/src/main/resources/application.yml](backend/src/main/resources/application.yml) and update the `username` and `password` fields to match your local MySQL setup:
 
 ```yaml
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/warehouse_inventory?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/warehouse_inventory?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
     username: root
     password: ""        # Leave blank if no password set (Homebrew default)
+    driver-class-name: com.mysql.cj.jdbc.Driver
 ```
+
+Only `username` and `password` need to change — leave the `url` and `driver-class-name` as-is.
 
 > If you installed MySQL with a password, enter it here. If you're unsure, try leaving it blank first.
 
