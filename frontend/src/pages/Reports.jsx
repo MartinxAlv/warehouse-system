@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client.js'
+import Icon from '../components/Icon.jsx'
 
 const STATUS_COLORS = {
   PENDING: '#f59e0b', CONFIRMED: '#6366f1', FULFILLED: '#059669', CANCELLED: '#dc2626',
@@ -102,31 +103,31 @@ export default function Reports() {
         <h1>Reports & Analytics</h1>
       </div>
 
-      {error && <div className="error-banner">⚠️ {error}</div>}
+      {error && <div className="error-banner">{error}</div>}
 
       <div className="kpi-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: 28 }}>
         <div className="kpi-card kpi-blue">
           <div className="kpi-top">
             <div><div className="kpi-value">{inventory.length}</div><div className="kpi-label">Inventory Lines</div></div>
-            <div className="kpi-icon blue">🗂️</div>
+            <div className="kpi-icon blue"><Icon name="inventory" size={20} strokeWidth={1.5} /></div>
           </div>
         </div>
         <div className="kpi-card kpi-green">
           <div className="kpi-top">
             <div><div className="kpi-value">{totalStock.toLocaleString()}</div><div className="kpi-label">Total Units</div></div>
-            <div className="kpi-icon green">📦</div>
+            <div className="kpi-icon green"><Icon name="package" size={20} strokeWidth={1.5} /></div>
           </div>
         </div>
         <div className={`kpi-card ${lowStockCount > 0 ? 'kpi-red' : 'kpi-green'}`}>
           <div className="kpi-top">
             <div><div className="kpi-value">{lowStockCount}</div><div className="kpi-label">Low Stock Items</div></div>
-            <div className="kpi-icon red">⚠️</div>
+            <div className="kpi-icon red"><Icon name="alert" size={20} strokeWidth={1.5} /></div>
           </div>
         </div>
         <div className="kpi-card kpi-purple">
           <div className="kpi-top">
             <div><div className="kpi-value">{orders.length}</div><div className="kpi-label">Total Orders</div></div>
-            <div className="kpi-icon purple">📬</div>
+            <div className="kpi-icon purple"><Icon name="orders" size={20} strokeWidth={1.5} /></div>
           </div>
         </div>
       </div>
@@ -135,7 +136,7 @@ export default function Reports() {
         <div className="panel">
           <h2>Stock Levels by Product</h2>
           {productStock.length === 0 ? (
-            <div className="empty-state"><span className="empty-icon">📦</span>No inventory data</div>
+            <div className="empty-state">No inventory data yet.</div>
           ) : (
             <div className="hbar-chart">
               {productStock.map((d) => (
@@ -149,7 +150,7 @@ export default function Reports() {
         <div className="panel">
           <h2>Customer Order Status</h2>
           {orderStatusData.length === 0 ? (
-            <div className="empty-state"><span className="empty-icon">📬</span>No orders yet</div>
+            <div className="empty-state">No orders yet.</div>
           ) : (
             <>
               <BarChart data={orderStatusData} height={180} />
@@ -169,7 +170,7 @@ export default function Reports() {
         <div className="panel">
           <h2>Purchase Order Status</h2>
           {poStatusData.length === 0 ? (
-            <div className="empty-state"><span className="empty-icon">🛒</span>No purchase orders yet</div>
+            <div className="empty-state">No purchase orders yet.</div>
           ) : (
             <>
               <BarChart data={poStatusData} height={180} />

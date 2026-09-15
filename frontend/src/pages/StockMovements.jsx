@@ -68,7 +68,7 @@ export default function StockMovements() {
         </div>
       </div>
 
-      {error && <div className="error-banner">⚠️ {error}</div>}
+      {error && <div className="error-banner">{error}</div>}
 
       <div className="filter-bar">
         <input

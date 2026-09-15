@@ -44,12 +44,11 @@ export default function Warehouses() {
         <h1>Warehouses</h1>
         <button className="btn-primary" onClick={() => setShowForm(true)}>+ Add Warehouse</button>
       </div>
-      {error && <div className="error-banner">⚠️ {error}</div>}
+      {error && <div className="error-banner">{error}</div>}
 
       <div className="warehouse-list">
         {warehouses.length === 0 && (
           <div className="empty-state panel">
-            <span className="empty-icon">🏢</span>
             No warehouses yet. Add one to start tracking inventory.
           </div>
         )}
@@ -61,7 +60,7 @@ export default function Warehouses() {
             <div key={w.id} className="warehouse-card">
               <div className="warehouse-card-header" onClick={() => toggleExpand(w.id)}>
                 <div className="warehouse-card-info">
-                  <div className="warehouse-icon">🏢</div>
+                  <div className="warehouse-icon">{w.name.charAt(0)}</div>
                   <div>
                     <div className="warehouse-name">{w.name}</div>
                     <div className="muted small">{w.location || 'No location set'}</div>

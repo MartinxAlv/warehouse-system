@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import Icon from '../components/Icon.jsx'
 
 const ROLE_LABELS = { ADMIN: 'Admin', WAREHOUSE_STAFF: 'Warehouse Staff', SALES_STAFF: 'Sales Staff' }
 const ROLE_COLORS = { ADMIN: 'badge-purple', WAREHOUSE_STAFF: 'badge-blue', SALES_STAFF: 'badge-green' }
@@ -45,14 +46,14 @@ export default function Dashboard() {
       .catch((e) => setError(e.message))
   }, [])
 
-  if (error) return <div className="error-banner">⚠️ {error} — is the backend running on :8080?</div>
+  if (error) return <div className="error-banner">{error} — is the backend running on :8080?</div>
   if (!summary) return <Spinner />
 
   const kpis = [
-    { label: 'Total Products',          value: summary.totalProducts,         color: 'blue',   icon: '📦' },
-    { label: 'Low Stock Items',          value: summary.lowStockCount,         color: 'amber',  icon: '⚠️' },
-    { label: 'Pending Purchase Orders',  value: summary.pendingPurchaseOrders, color: 'purple', icon: '🛒' },
-    { label: 'Pending Customer Orders',  value: summary.pendingCustomerOrders, color: 'green',  icon: '📬' },
+    { label: 'Total Products',          value: summary.totalProducts,         color: 'blue',   icon: 'products' },
+    { label: 'Low Stock Items',          value: summary.lowStockCount,         color: 'amber',  icon: 'alert' },
+    { label: 'Pending Purchase Orders',  value: summary.pendingPurchaseOrders, color: 'purple', icon: 'purchaseOrders' },
+    { label: 'Pending Customer Orders',  value: summary.pendingCustomerOrders, color: 'green',  icon: 'orders' },
   ]
 
   return (
@@ -77,7 +78,9 @@ export default function Dashboard() {
                 <div className="kpi-value">{k.value}</div>
                 <div className="kpi-label">{k.label}</div>
               </div>
-              <div className={`kpi-icon ${k.color}`}>{k.icon}</div>
+              <div className={`kpi-icon ${k.color}`}>
+                <Icon name={k.icon} size={20} strokeWidth={1.5} />
+              </div>
             </div>
           </div>
         ))}
@@ -85,12 +88,9 @@ export default function Dashboard() {
 
       <div className="two-col">
         <section className="panel">
-          <h2>⚠️ Low Stock Alerts</h2>
+          <h2>Low Stock Alerts</h2>
           {lowStock.length === 0 ? (
-            <div className="empty-state">
-              <span className="empty-icon">🎉</span>
-              All products are well stocked!
-            </div>
+            <div className="empty-state">All products are well stocked.</div>
           ) : (
             <table>
               <thead>
@@ -115,12 +115,9 @@ export default function Dashboard() {
         </section>
 
         <section className="panel">
-          <h2>📋 Recent Stock Activity</h2>
+          <h2>Recent Stock Activity</h2>
           {movements.length === 0 ? (
-            <div className="empty-state">
-              <span className="empty-icon">📭</span>
-              No stock movements yet.
-            </div>
+            <div className="empty-state">No stock movements yet.</div>
           ) : (
             <ul className="activity-list">
               {movements.map((m) => (

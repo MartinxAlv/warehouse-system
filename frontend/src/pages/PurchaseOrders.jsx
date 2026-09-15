@@ -85,7 +85,7 @@ export default function PurchaseOrders() {
         </div>
         <button className="btn-primary" onClick={() => setShowForm(true)}>+ New Purchase Order</button>
       </div>
-      {error && <div className="error-banner">⚠️ {error}</div>}
+      {error && <div className="error-banner">{error}</div>}
 
       <table>
         <thead>

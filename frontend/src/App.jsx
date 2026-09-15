@@ -25,7 +25,7 @@ function RequireAdmin({ children }) {
   if (!user) return <Navigate to="/login" replace />
   if (user.role !== 'ADMIN') return (
     <div className="content">
-      <div className="error-banner">🔒 This page requires Admin access.</div>
+      <div className="error-banner">This page requires Admin access.</div>
     </div>
   )
   return children

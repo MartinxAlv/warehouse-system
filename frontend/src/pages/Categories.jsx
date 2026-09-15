@@ -63,7 +63,7 @@ export default function Categories() {
         <button className="btn-primary" onClick={() => setShowForm(true)}>+ Add Category</button>
       </div>
 
-      {error && <div className="error-banner">⚠️ {error}</div>}
+      {error && <div className="error-banner">{error}</div>}
 
       <table>
         <thead>

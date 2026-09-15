@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { api } from '../api/client.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useToast } from '../context/ToastContext.jsx'
+import Icon from '../components/Icon.jsx'
 
 const ROLE_LABELS = { ADMIN: 'Admin', WAREHOUSE_STAFF: 'Warehouse Staff', SALES_STAFF: 'Sales Staff' }
 const ROLE_COLORS = { ADMIN: 'badge-purple', WAREHOUSE_STAFF: 'badge-blue', SALES_STAFF: 'badge-green' }
@@ -12,6 +13,14 @@ export default function Profile() {
   const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [dark, setDark] = useState(() => localStorage.getItem('theme') === 'dark')
+
+  function toggleDark() {
+    const next = !dark
+    setDark(next)
+    localStorage.setItem('theme', next ? 'dark' : 'light')
+    document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -55,7 +64,7 @@ export default function Profile() {
             <div className="profile-details">
               <div className="profile-name">{user?.fullName}</div>
               <div className="muted small">{user?.email}</div>
-              <span className={`badge ${ROLE_COLORS[user?.role] ?? 'badge-gray'}`} style={{ marginTop: 8 }}>
+              <span className={`profile-role-tag ${ROLE_COLORS[user?.role] ?? 'badge-gray'}`}>
                 {ROLE_LABELS[user?.role] ?? user?.role}
               </span>
             </div>
@@ -87,7 +96,7 @@ export default function Profile() {
             Choose a strong password of at least 6 characters.
           </p>
 
-          {error && <div className="error-banner" style={{ marginBottom: 16 }}>⚠️ {error}</div>}
+          {error && <div className="error-banner">{error}</div>}
 
           <form onSubmit={handleSubmit} className="stacked-form">
             <label>
@@ -127,6 +136,20 @@ export default function Profile() {
               </button>
             </div>
           </form>
+        </div>
+
+        <div className="panel appearance-panel">
+          <h2>Appearance</h2>
+          <div className="admin-tool-row" style={{ borderTop: 'none', paddingTop: 0 }}>
+            <div className="admin-tool-info">
+              <strong>Dark Mode</strong>
+              <p className="muted small">Use a dark color scheme throughout the application.</p>
+            </div>
+            <button onClick={toggleDark} className={dark ? 'btn-primary' : 'btn-secondary'}>
+              <Icon name={dark ? 'sun' : 'moon'} size={15} />
+              {dark ? 'On' : 'Off'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

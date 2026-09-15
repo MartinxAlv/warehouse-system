@@ -123,7 +123,7 @@ export default function Products() {
         <button className="btn-primary" onClick={() => setShowForm(true)}>+ Add Product</button>
       </div>
 
-      {error && <div className="error-banner">⚠️ {error}</div>}
+      {error && <div className="error-banner">{error}</div>}
 
       <div className="filter-bar">
         <input

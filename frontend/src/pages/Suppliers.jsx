@@ -70,7 +70,7 @@ export default function Suppliers() {
         <h1>Suppliers</h1>
         <button className="btn-primary" onClick={() => setShowForm(true)}>+ Add Supplier</button>
       </div>
-      {error && <div className="error-banner">⚠️ {error}</div>}
+      {error && <div className="error-banner">{error}</div>}
 
       <table>
         <thead><tr><th>Name</th><th>Contact Email</th><th>Phone</th><th>Address</th><th></th></tr></thead>

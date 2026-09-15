@@ -33,13 +33,13 @@ export default function Login() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-brand">
-          <div className="login-logo">📦</div>
+          <div className="login-logo-mark">W</div>
           <h1 className="login-title">Warehouse IMS</h1>
           <p className="login-sub">Sign in to your account</p>
         </div>
 
         {error && (
-          <div className="error-banner" style={{ marginBottom: 0 }}>⚠️ {error}</div>
+          <div className="error-banner" style={{ marginBottom: 0 }}>{error}</div>
         )}
 
         <form onSubmit={handleSubmit} className="stacked-form">

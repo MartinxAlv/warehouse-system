@@ -62,9 +62,9 @@ export default function Inventory() {
           <h1>Inventory</h1>
           <p className="muted small">{items.length} inventory line{items.length !== 1 ? 's' : ''}</p>
         </div>
-        <button className="btn-secondary" title="Move stock from one warehouse to another" onClick={() => setShowTransfer(true)}>↔ Transfer Stock</button>
+        <button className="btn-secondary" title="Move stock from one warehouse to another" onClick={() => setShowTransfer(true)}>Transfer Stock</button>
       </div>
-      {error && <div className="error-banner">⚠️ {error}</div>}
+      {error && <div className="error-banner">{error}</div>}
 
       <table>
         <thead>

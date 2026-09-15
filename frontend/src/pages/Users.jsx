@@ -127,7 +127,7 @@ export default function Users() {
         <button className="btn-primary" onClick={() => setShowCreate(true)}>+ Add User</button>
       </div>
 
-      {error && <div className="error-banner">⚠️ {error}</div>}
+      {error && <div className="error-banner">{error}</div>}
 
       <table>
         <thead>
