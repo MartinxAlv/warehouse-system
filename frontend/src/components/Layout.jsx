@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import Icon from './Icon.jsx'
+import BrandMark from './BrandMark.jsx'
 
 const ROLE_COLORS = { ADMIN: 'badge-purple', WAREHOUSE_STAFF: 'badge-blue', SALES_STAFF: 'badge-green' }
 const ROLE_LABELS = { ADMIN: 'Admin', WAREHOUSE_STAFF: 'Warehouse', SALES_STAFF: 'Sales' }
@@ -87,8 +88,8 @@ export default function Layout() {
       <aside className={`sidebar${collapsed ? ' sidebar--collapsed' : ''}`}>
         <div className="sidebar-brand">
           <div className="brand-left">
-            <div className="brand-logo-mark">W</div>
-            <span className="brand-text">Warehouse IMS</span>
+            <div className="brand-logo-mark"><BrandMark size={17} /></div>
+            <span className="brand-text">Stockwell</span>
           </div>
           <button
             className="sidebar-collapse-btn"

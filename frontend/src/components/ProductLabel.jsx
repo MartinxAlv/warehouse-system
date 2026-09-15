@@ -1,5 +1,6 @@
 import { QRCodeSVG } from 'qrcode.react'
 import Modal from './Modal.jsx'
+import BrandMark from './BrandMark.jsx'
 
 export default function ProductLabel({ item, onClose }) {
   const { product, warehouse, binLocation } = item
@@ -9,8 +10,8 @@ export default function ProductLabel({ item, onClose }) {
       <div className="label-preview">
         <div className="label-card">
           <div className="label-header">
-            <div className="label-brand-mark">W</div>
-            <span className="label-brand-name">Warehouse IMS</span>
+            <div className="label-brand-mark"><BrandMark size={13} /></div>
+            <span className="label-brand-name">Stockwell</span>
           </div>
           <div className="label-body">
             <div className="label-qr">

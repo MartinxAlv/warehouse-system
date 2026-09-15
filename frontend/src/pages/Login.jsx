@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api/client.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import BrandMark from '../components/BrandMark.jsx'
 
 export default function Login() {
   const { login } = useAuth()
@@ -33,8 +34,8 @@ export default function Login() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-brand">
-          <div className="login-logo-mark">W</div>
-          <h1 className="login-title">Warehouse IMS</h1>
+          <div className="login-logo-mark"><BrandMark size={26} /></div>
+          <h1 className="login-title">Stockwell</h1>
           <p className="login-sub">Sign in to your account</p>
         </div>
 

@@ -1,6 +1,6 @@
-# Warehouse Inventory Management System
+# Stockwell — Warehouse Management System
 
-A full-stack warehouse and eCommerce inventory management system built with **Spring Boot** (Java) and **React**. Supports role-based access control, purchase order workflows, customer order fulfillment, real-time stock tracking, and reporting.
+A full-stack warehouse inventory management system built with **Spring Boot** (Java) and **React**. Supports role-based access control, purchase order workflows, customer order fulfillment, real-time stock tracking, bin location tracking, QR product labels, and reporting.
 
 ---
 
@@ -9,17 +9,23 @@ A full-stack warehouse and eCommerce inventory management system built with **Sp
 ### Authentication & Access Control
 - JWT-based login with secure token storage
 - Three user roles with different permissions:
-  - **Admin** — full access to everything including user management and categories
+  - **Admin** — full access including user management, categories, and admin tools
   - **Warehouse Staff** — inventory operations, purchase orders, stock adjustments
   - **Sales Staff** — customer orders only
 - Demo accounts pre-seeded on first run
 
 ### Inventory Management
 - Track stock levels per product per warehouse
+- **Bin location tracking** — assign and update a physical bin address for every inventory line (e.g. "Aisle A · Row 1 · Bin 3")
 - Adjust stock manually with a required reason (Damaged, Recount, Return, Theft, Expired, Restocked)
 - Transfer stock between warehouses
 - Low stock alerts based on configurable reorder thresholds
 - Full audit trail — every stock change is logged in the Stock Movement Log
+
+### QR Product Labels
+- Print a physical label for any inventory item directly from the Inventory page
+- Each label includes the product name, SKU (as a styled code), bin location, warehouse name, and a QR code encoding the SKU
+- Print-ready — clicking Print shows only the label at a standard sticker size
 
 ### Purchase Orders (Supplier → Warehouse)
 - Create multi-line purchase orders with multiple products
@@ -54,18 +60,22 @@ A full-stack warehouse and eCommerce inventory management system built with **Sp
 - Assign and change roles
 - Password reset from the admin panel
 
-### Profile
+### Profile & Appearance
 - Every user can change their own password from the Profile page
+- **Dark mode** toggle in Profile → Appearance — persists across sessions via localStorage
 - Accessible by clicking your name in the sidebar
 
 ### UI/UX
-- Personalized welcome banner on the Dashboard (greets by name and role)
+- **Dark mode** — full dark color scheme across all pages, toggled from the Profile page
+- **Collapsible sidebar** — collapse to icon-only mode to maximise screen space; preference is saved across sessions
+- Custom SVG brand mark and feather-style icons throughout (no emoji)
+- Zebra-striped table rows for easier reading
+- Personalized welcome banner on the Dashboard
 - Breadcrumb navigation on every page
 - Toast notifications for successful actions
-- Custom confirmation dialogs for destructive actions (no browser `confirm()`)
+- Confirmation dialogs for all destructive actions
 - Tooltips on every action button
 - Timestamps on all orders and stock movements
-- Fully responsive sidebar navigation
 
 ---
 
@@ -78,6 +88,7 @@ A full-stack warehouse and eCommerce inventory management system built with **Sp
 | Database ORM | Spring Data JPA / Hibernate |
 | Database | MySQL 8+ |
 | Frontend | React 18, React Router v6, Vite |
+| QR Codes | qrcode.react |
 | Styling | Custom CSS with CSS variables (no UI library) |
 | Fonts | Inter (Google Fonts) |
 
@@ -87,7 +98,7 @@ A full-stack warehouse and eCommerce inventory management system built with **Sp
 
 ```
 warehouse-system/
-├── docs/                          # Design documents
+├── docs/
 │   ├── 01-problem-domain-and-requirements.md
 │   ├── 02-ui-design.md
 │   ├── 03-class-diagram.md
@@ -96,17 +107,17 @@ warehouse-system/
 ├── backend/
 │   └── src/main/java/com/warehouse/inventory/
 │       ├── config/                # CORS, Security (JWT), DataInitializer
-│       ├── controller/            # REST endpoints (Auth, Products, Orders, etc.)
+│       ├── controller/            # REST endpoints (Auth, Products, Orders, Inventory, Admin, etc.)
 │       ├── exception/             # Global exception handler
-│       ├── model/                 # JPA entities (Product, Order, User, etc.)
+│       ├── model/                 # JPA entities (Product, InventoryItem, Order, User, etc.)
 │       ├── repository/            # Spring Data JPA repositories
 │       ├── security/              # JwtService, JwtAuthFilter, UserDetailsService
-│       └── service/               # Business logic (InventoryService, etc.)
+│       └── service/               # Business logic (InventoryService, SampleDataService, etc.)
 │
 └── frontend/
     └── src/
         ├── api/client.js          # Fetch wrapper with JWT header injection
-        ├── components/            # Layout, Modal, ConfirmModal, StatusBadge
+        ├── components/            # Layout, Modal, ConfirmModal, BrandMark, ProductLabel, Icon
         ├── context/               # AuthContext, ToastContext
         ├── pages/                 # All page components
         └── styles/global.css      # Design system and component styles
@@ -117,8 +128,8 @@ warehouse-system/
 ## Prerequisites
 
 - **Java 17 or higher** — [Download](https://adoptium.net/)
-- **Maven 3.8+** — [Download](https://maven.apache.org/download.cgi) or install via Homebrew: `brew install maven`
-- **MySQL 8+** — [Download](https://dev.mysql.com/downloads/) or install via Homebrew: `brew install mysql`
+- **Maven 3.8+** — [Download](https://maven.apache.org/download.cgi) or via Homebrew: `brew install maven`
+- **MySQL 8+** — [Download](https://dev.mysql.com/downloads/) or via Homebrew: `brew install mysql`
 - **Node.js 18+** — [Download](https://nodejs.org/)
 
 ---
@@ -133,15 +144,15 @@ Make sure MySQL is running on `localhost:3306`.
 # macOS (Homebrew)
 brew services start mysql
 
-# Windows / Linux — start MySQL from Services or:
+# Windows / Linux
 sudo systemctl start mysql
 ```
 
-The app will **automatically create the database and all tables** on first run — you do not need to run any SQL scripts.
+The app will **automatically create the database and all tables** on first run — no SQL scripts needed.
 
 ### 2. Configure the Database
 
-Open `backend/src/main/resources/application.yml` and update the credentials to match your local MySQL setup:
+Open `backend/src/main/resources/application.yml` and update the credentials to match your local MySQL:
 
 ```yaml
 spring:
@@ -157,7 +168,7 @@ cd backend
 mvn spring-boot:run
 ```
 
-The backend starts on **http://localhost:8080**. You will see Hibernate SQL output confirming it connected to the database. On first boot, three demo user accounts are automatically created.
+The backend starts on **http://localhost:8080**. On first boot, three demo user accounts are automatically created.
 
 ### 4. Start the Frontend
 
@@ -173,7 +184,7 @@ The frontend starts on **http://localhost:5173**.
 
 ### 5. Log In
 
-Open **http://localhost:5173** in your browser. Use one of the demo accounts:
+Open **http://localhost:5173** and sign in with a demo account:
 
 | Role | Email | Password |
 |---|---|---|
@@ -185,56 +196,60 @@ Open **http://localhost:5173** in your browser. Use one of the demo accounts:
 
 ## Sample Data
 
-The system ships with a one-click sample dataset that creates a realistic business scenario so you can demo the full workflow immediately — no manual data entry needed.
+The system includes a one-click sample dataset that populates a realistic business scenario so you can demo the full workflow immediately.
 
 ### How to load it
 
-1. Log in as **Admin** (`admin@warehouse.com` / `admin123`)
+1. Log in as **Admin**
 2. Go to **User Management** (sidebar)
 3. Scroll to the **Admin Tools** panel at the bottom
 4. Click **Load Sample Data**
 
-The page shows a green **Data loaded** badge when data is present, and a grey **Empty** badge when the system is clean.
+A green **Data loaded** badge confirms the data is present. A grey **Empty** badge means the system is clean.
 
 ### What gets created
 
-| Type | Records |
-|---|---|
-| Categories | Electronics, Accessories |
-| Suppliers | AsiaLink Electronics, SwiftParts Co. |
-| Warehouses | Main Warehouse (Chicago), East Coast Hub (New York) |
-| Products | USB-C Cable 2m, 65W GaN Charger, Wireless Mouse, Laptop Stand, HDMI Cable 3m |
-| Purchase Orders | 3 — all received (stock already in inventory) |
-| Customer Orders | 5 — Fulfilled ×2, Confirmed ×1, Pending ×1, Cancelled ×1 |
-| Stock Movements | Full log from all PO receipts, sales, and 2 manual adjustments |
+| Type | Count | Details |
+|---|---|---|
+| Categories | 4 | Cables & Adapters, Peripherals, Power & Charging, Audio & Video |
+| Suppliers | 3 | AsiaLink Electronics, SwiftParts Co., ProGear Supplies |
+| Warehouses | 3 | Main Warehouse (Chicago), East Coast Hub (New York), West Coast Depot (Los Angeles) |
+| Products | 10 | USB-C Cable, HDMI Cable, 65W GaN Charger, 130W Laptop Charger, Wireless Mouse, Mechanical Keyboard, USB-C Hub, 1080p Webcam, Noise-Cancelling Headset, Laptop Stand |
+| Purchase Orders | 9 | 6 Received, 2 Submitted, 1 Draft |
+| Customer Orders | 15 | 7 Fulfilled, 3 Confirmed, 3 Pending, 2 Cancelled |
+| Stock Movements | Full log | All PO receipts, sales, manual adjustments, and transfers |
+| Bin Locations | 21 | Every inventory line has a pre-set bin address (e.g. "Aisle A · Row 1 · Bin 3") |
 
-The data is intentionally designed to trigger **low-stock alerts** on two inventory lines (East Coast Hub Charger and Mouse), so the dashboard and reports pages show realistic warnings straight away.
+Three inventory lines are intentionally set to **Low Stock** so the dashboard and reports show realistic alerts immediately.
 
 ### How to clear it
 
-Click **Clear All Data** in the same Admin Tools panel. This permanently deletes all products, orders, inventory, suppliers, warehouses, categories, and non-demo users. The three demo accounts (admin, staff, sales) are always preserved.
-
-You can load the sample data again immediately after clearing.
+Click **Clear All Data** in the Admin Tools panel. This removes all products, orders, inventory, suppliers, warehouses, and categories. The three demo accounts are always preserved.
 
 ---
 
 ## Demo Walkthrough
 
-Follow these steps to see the full system workflow after logging in as **Admin**:
+After loading sample data, log in as **Admin** and explore:
 
-1. **Add a Category** → `Categories` → Add Category (e.g. "Electronics")
-2. **Add a Supplier** → `Suppliers` → Add Supplier (e.g. "Tech Supplies Co.")
-3. **Add a Warehouse** → `Warehouses` → Add Warehouse (e.g. "Main Warehouse, Chicago IL")
-4. **Add a Product** → `Products` → Add Product, select the category you just created
-5. **Create a Purchase Order** → `Purchase Orders` → New Purchase Order
-   - Select the supplier, add line items (product + quantity + unit cost)
-   - Submit the order, then Receive it → stock is added to inventory automatically
-6. **Check Inventory** → `Inventory` → the product now shows stock on hand
-7. **Create a Customer Order** → `Customer Orders` → New Order
-   - Enter customer info, add line items
-   - Confirm the order, then Fulfill it → stock is deducted automatically
-8. **View the Stock Log** → `Stock Log` → shows every stock movement with timestamps
-9. **View Reports** → `Reports` → charts update with your real data
+1. **Dashboard** — welcome banner, low stock alerts, recent activity, KPI summary
+2. **Inventory** — see bin locations per item, click any bin to edit it, print a QR label
+3. **Reports** — live charts showing stock health, order status breakdowns, value summaries
+4. **Purchase Orders** — view received/submitted/draft POs, create and receive a new one
+5. **Customer Orders** — view the full fulfillment pipeline, create and fulfill an order
+6. **Stock Log** — full timestamped audit trail of every stock movement
+7. **Profile** — toggle dark mode under Appearance, change your password
+
+Or follow the full manual workflow from scratch:
+
+1. **Add a Category** → `Categories` → Add Category
+2. **Add a Supplier** → `Suppliers` → Add Supplier
+3. **Add a Warehouse** → `Warehouses` → Add Warehouse
+4. **Add a Product** → `Products` → Add Product
+5. **Receive Stock** → `Purchase Orders` → New PO → Submit → Receive
+6. **Check Inventory** → `Inventory` → set a bin location, print a label
+7. **Fulfill an Order** → `Customer Orders` → New Order → Confirm → Fulfill
+8. **View the Log** → `Stock Log` → every movement with timestamps
 
 ---
 
@@ -244,9 +259,9 @@ Follow these steps to see the full system workflow after logging in as **Admin**
 
 This system is designed for **small to medium-sized businesses** that buy goods from suppliers, store them in one or more warehouses, and sell them to customers. Examples include:
 
-- An **electronics distributor** that imports components from manufacturers and ships orders to retail stores
+- An **electronics distributor** importing components from manufacturers and shipping to retail stores
 - A **clothing retailer** with a stockroom and an online shop
-- A **wholesale food supplier** managing stock across multiple distribution centers
+- A **wholesale food supplier** managing stock across multiple distribution centres
 - A **school supply company** processing bulk orders from schools and universities
 
 The system replaces spreadsheets and manual stock counts with a centralised, role-controlled platform that keeps inventory accurate in real time.
@@ -255,135 +270,92 @@ The system replaces spreadsheets and manual stock counts with a centralised, rol
 
 ### How the Three Roles Work Day-to-Day
 
-| Role | Typical Person | What They Do in the System |
+| Role | Typical Person | What They Do |
 |---|---|---|
-| **Admin** | Store manager / operations manager | Sets up the system (products, categories, suppliers, warehouses), manages staff accounts, views all reports |
-| **Warehouse Staff** | Warehouse operative / stockroom worker | Receives incoming shipments, adjusts stock for damage or miscounts, transfers stock between warehouses |
-| **Sales Staff** | Sales rep / customer service | Creates customer orders, confirms and fulfills them, checks stock availability before promising delivery |
+| **Admin** | Store / operations manager | Sets up products, categories, suppliers, warehouses; manages staff accounts; views all reports |
+| **Warehouse Staff** | Warehouse operative | Receives shipments, adjusts stock for damage or miscounts, transfers stock, sets bin locations, prints labels |
+| **Sales Staff** | Sales rep / customer service | Creates customer orders, confirms and fulfills them, checks stock availability |
 
 ---
 
 ### Real-World Example: Electronics Distributor
 
-**The Company:** *BrightTech Supplies* imports cables, chargers, and accessories from two suppliers and ships orders to independent electronics shops across the country. They have two warehouses — one in Sydney and one in Melbourne.
+**The Company:** *BrightTech Supplies* imports cables, chargers, and accessories from two suppliers and ships to independent electronics shops. They run three warehouses — Chicago, New York, and Los Angeles.
 
----
-
-#### Step 1 — Admin sets up the system (one-time)
-
-The manager logs in as **Admin** and:
-
-1. Creates two **warehouses**: "Sydney Warehouse" and "Melbourne Warehouse"
-2. Creates product **categories**: Cables, Chargers, Accessories
-3. Adds **suppliers**: "AsiaLink Electronics" and "FastShip Components"
-4. Adds **products** to the catalog:
-   - USB-C Cable 1m (SKU: CBL-USBC-1M, price: $12.99, reorder threshold: 50)
-   - 65W GaN Charger (SKU: CHG-GAN-65W, price: $49.99, reorder threshold: 20)
-5. Creates staff accounts — one for the warehouse team in each city, and two for the sales team
-
----
+#### Step 1 — Admin sets up the system
+Creates warehouses, categories, suppliers, products, and staff accounts.
 
 #### Step 2 — Warehouse Staff receives a shipment
-
-A delivery arrives at the Sydney warehouse. The warehouse operative logs in and:
-
-1. Goes to **Purchase Orders** → creates a new purchase order from "AsiaLink Electronics"
-2. Adds two line items: 200× USB-C Cable 1m @ $4.50 cost each, 80× 65W GaN Charger @ $18.00 cost each
-3. Clicks **Submit** to confirm the order was placed with the supplier
-4. When the boxes physically arrive, clicks **Receive** — the system automatically adds 200 USB-C cables and 80 chargers to the Sydney Warehouse inventory
-5. The **Stock Movement Log** records both receipts with a timestamp and reason of `PURCHASE_RECEIPT`
-
-The Melbourne warehouse goes through the same process independently when their own shipment arrives.
-
----
+Creates a purchase order, submits it, then receives the delivery — stock is added automatically. Bin locations are set for each item so pickers know exactly where to find them.
 
 #### Step 3 — Sales Staff fulfills a customer order
-
-A shop in Brisbane calls in an order. The sales rep logs in and:
-
-1. Goes to **Customer Orders** → creates a new order for "Brisbane Electronics Pty Ltd"
-2. Adds line items: 30× USB-C Cable 1m, 10× 65W GaN Charger
-3. Clicks **Confirm** once the customer agrees to the quote
-4. Clicks **Fulfill** when the goods are packed and dispatched
-5. The system automatically deducts 30 cables and 10 chargers from inventory
-6. The Stock Movement Log records the outbound movements as `SALE` entries with a timestamp
-
----
+Creates an order, confirms it with the customer, and fulfills it — stock is deducted automatically.
 
 #### Step 4 — Warehouse Staff handles a discrepancy
-
-During a routine stocktake, the Melbourne operative finds 3 cables are damaged. They:
-
-1. Go to **Inventory** → find the USB-C Cable 1m row for Melbourne Warehouse
-2. Click **Adjust**, enter `-3` as the quantity change, select reason **Damaged**
-3. The system updates the stock level and logs the adjustment so there is a permanent record of why the count changed
-
----
+During a stocktake, finds 3 damaged cables. Uses Inventory → Adjust → `-3` → reason: Damaged. The log records the change permanently.
 
 #### Step 5 — Transfer stock between warehouses
+Chicago is overstocked on chargers; New York is running low. Uses Inventory → Transfer Stock to move 20 units. Both movements are logged.
 
-Sydney is overstocked on chargers. Melbourne is running low. The warehouse manager:
+#### Step 6 — Print a product label
+Before shelving a new shipment, the warehouse operative prints QR labels for each product. The label shows the product name, SKU, bin address, and a scannable QR code for quick lookup.
 
-1. Goes to **Inventory** → clicks **Transfer Stock**
-2. Selects product: 65W GaN Charger, from: Sydney Warehouse, to: Melbourne Warehouse, quantity: 20
-3. Confirms — Sydney loses 20 units, Melbourne gains 20 units, and both movements are logged with timestamps
-
----
-
-#### Step 6 — Manager reviews the dashboard and reports
-
-At the end of the week, the manager logs in as **Admin** and:
-
-1. Checks the **Dashboard** — sees the welcome banner, recent stock movements, low stock alerts, and a summary of order activity at a glance
-2. Opens **Reports** — sees a bar chart showing which products are well-stocked vs. near their reorder threshold
-3. Notices the USB-C Cable 1m bar is amber — 42 units remain and the reorder threshold is 50 — so they raise a new purchase order before stock runs out
+#### Step 7 — Manager reviews reports
+Checks the Dashboard for low-stock alerts and opens Reports to see which products are near their reorder threshold. Raises a new purchase order before stock runs out.
 
 ---
 
 ### Why This Is Better Than a Spreadsheet
 
-| Problem with Spreadsheets | How This System Solves It |
+| Problem with Spreadsheets | How Stockwell Solves It |
 |---|---|
-| Anyone can change any number without a record | Every stock change has a reason, a timestamp, and a log entry |
-| No access control — everyone sees everything | Role-based access: sales staff cannot touch inventory settings |
-| Stock does not update automatically | Receiving a PO or fulfilling an order updates stock instantly |
-| Hard to track across multiple locations | Each warehouse has its own inventory view; transfers are tracked end-to-end |
-| No alerting when stock gets low | Reorder threshold badges highlight at-risk products across all pages |
-| Easy to lose track of supplier costs | Purchase orders record unit costs and calculate totals automatically |
+| Anyone can change numbers without a record | Every stock change has a reason, a timestamp, and a log entry |
+| No access control | Role-based access: sales staff cannot touch inventory settings |
+| Stock doesn't update automatically | Receiving a PO or fulfilling an order updates stock instantly |
+| Hard to track across multiple locations | Each warehouse has its own view; transfers are tracked end-to-end |
+| No alerting when stock gets low | Reorder threshold badges highlight at-risk products everywhere |
+| No physical location system | Bin locations stored per inventory line; QR labels for fast picking |
+| Easy to lose supplier cost data | POs record unit costs and calculate totals automatically |
 
 ---
 
 ## API Overview
 
-All endpoints are under `http://localhost:8080/api/`. Protected endpoints require an `Authorization: Bearer <token>` header.
+All endpoints are under `http://localhost:8080/api/`. Protected endpoints require `Authorization: Bearer <token>`.
 
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
-| POST | `/api/auth/login` | Public | Returns JWT token |
-| GET | `/api/products` | All roles | List products |
-| POST | `/api/products` | Admin | Create product |
-| PUT | `/api/products/{id}` | Admin | Update product |
-| GET | `/api/inventory` | All roles | List inventory |
-| POST | `/api/inventory/adjust` | Admin, Warehouse | Adjust stock |
-| POST | `/api/inventory/transfer` | Admin, Warehouse | Transfer between warehouses |
-| GET | `/api/purchase-orders` | All roles | List purchase orders |
-| POST | `/api/purchase-orders` | Admin, Warehouse | Create purchase order |
-| POST | `/api/purchase-orders/{id}/receive` | Admin, Warehouse | Receive goods |
-| GET | `/api/orders` | All roles | List customer orders |
-| POST | `/api/orders` | All roles | Create customer order |
-| POST | `/api/orders/{id}/fulfill` | All roles | Fulfill order |
-| GET | `/api/users` | Admin | List users |
-| POST | `/api/users` | Admin | Create user |
-| PUT | `/api/profile/password` | All roles | Change own password |
-| GET | `/api/reports/...` | All roles | Dashboard and reports data |
+| POST | `/auth/login` | Public | Returns JWT token |
+| GET | `/products` | All | List products |
+| POST | `/products` | Admin | Create product |
+| PUT | `/products/{id}` | Admin | Update product |
+| GET | `/inventory` | All | List inventory with bin locations |
+| POST | `/inventory/adjust` | Admin, Warehouse | Manual stock adjustment |
+| POST | `/inventory/transfer` | Admin, Warehouse | Transfer between warehouses |
+| PATCH | `/inventory/{id}/location` | Admin, Warehouse | Update bin location |
+| GET | `/inventory/movements` | All | Stock movement log |
+| GET | `/purchase-orders` | All | List purchase orders |
+| POST | `/purchase-orders` | Admin, Warehouse | Create purchase order |
+| POST | `/purchase-orders/{id}/submit` | Admin, Warehouse | Submit order to supplier |
+| POST | `/purchase-orders/{id}/receive` | Admin, Warehouse | Receive goods into warehouse |
+| GET | `/orders` | All | List customer orders |
+| POST | `/orders` | All | Create customer order |
+| POST | `/orders/{id}/confirm` | All | Confirm order |
+| POST | `/orders/{id}/fulfill` | All | Fulfill order and deduct stock |
+| GET | `/users` | Admin | List users |
+| POST | `/users` | Admin | Create user |
+| PUT | `/users/{id}` | Admin | Update user |
+| PUT | `/profile/password` | All | Change own password |
+| GET | `/admin/sample-data/status` | Admin | Check if sample data is loaded |
+| POST | `/admin/sample-data/seed` | Admin | Load sample data |
+| DELETE | `/admin/sample-data/clear` | Admin | Clear all data |
 
 ---
 
 ## Stopping the Application
 
 ```bash
-# Stop both servers with Ctrl+C in each terminal
-# Or kill them all at once:
+# Ctrl+C in each terminal, or kill both at once:
 pkill -f "spring-boot:run"; pkill -f "vite"
 ```
 
@@ -393,8 +365,9 @@ pkill -f "spring-boot:run"; pkill -f "vite"
 
 This project was built as a school project demonstrating:
 - Full-stack web application development
-- RESTful API design
+- RESTful API design with Spring Boot
 - Relational database design with JPA/Hibernate
-- JWT authentication and role-based authorization
+- JWT authentication and role-based authorisation
 - React component architecture and state management
-- UI/UX design principles (layout, consistency, content awareness, minimizing user effort)
+- UI/UX design principles (layout, consistency, content awareness, minimising user effort)
+- Physical warehouse operations (bin locations, QR labels, stock transfers)
