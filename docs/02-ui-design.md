@@ -18,6 +18,7 @@
 │  > Reports         │                                      │
 │  > Categories*     │                                      │
 │  > Users*          │                                      │
+│  > System Log*     │                                      │
 │  ─────────────     │                                      │
 │  [A] Admin    ↩    │                                      │
 └──────────────────────────────────────────────────────────┘
@@ -33,8 +34,8 @@ to maximise screen space.
 - Expanded (default): shows brand mark + "Stockwell", section label, nav item icons +
   labels, user avatar + name + role badge + sign-out button.
 - Collapsed: hides all text labels; shows only icons centred in the 60px rail. The
-  brand mark stays visible. The user avatar is centred; the sign-out button is hidden
-  (accessible from Profile instead).
+  brand mark stays visible. The user avatar and sign-out icon are stacked vertically
+  at the bottom of the sidebar.
 - Collapse toggle: chevron button at the top-right of the brand area.
 - Preference is saved in `localStorage` and restored on next load.
 - Smooth width transition via CSS variable `--sidebar-width`.
