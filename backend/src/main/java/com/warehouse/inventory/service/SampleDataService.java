@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ public class SampleDataService {
     private final PurchaseOrderService purchaseOrderService;
     private final CustomerOrderService customerOrderService;
     private final InventoryService inventoryService;
+    private final AppLogService appLogService;
     private final JdbcTemplate jdbc;
 
     public SampleDataService(CategoryRepository categoryRepository,
@@ -29,6 +31,7 @@ public class SampleDataService {
                               PurchaseOrderService purchaseOrderService,
                               CustomerOrderService customerOrderService,
                               InventoryService inventoryService,
+                              AppLogService appLogService,
                               JdbcTemplate jdbc) {
         this.categoryRepository = categoryRepository;
         this.supplierRepository = supplierRepository;
@@ -37,6 +40,7 @@ public class SampleDataService {
         this.purchaseOrderService = purchaseOrderService;
         this.customerOrderService = customerOrderService;
         this.inventoryService = inventoryService;
+        this.appLogService = appLogService;
         this.jdbc = jdbc;
     }
 
@@ -251,10 +255,19 @@ public class SampleDataService {
         setBin(kb,      west, "Aisle B · Row 1 · Bin 5");
         setBin(stand,   west, "Aisle B · Row 2 · Bin 1");
         setBin(headset, west, "Aisle A · Row 2 · Bin 2");
+
+        // ── Sample system log entries ─────────────────────────────────────────
+        seedLog("INFO",  "Sample data loaded",                                                   "Admin: Load Sample Data",  "admin@warehouse.com",  -5);
+        seedLog("INFO",  "All data cleared",                                                      "Admin: Clear All Data",    "admin@warehouse.com",  -3);
+        seedLog("INFO",  "Sample data loaded",                                                   "Admin: Load Sample Data",  "admin@warehouse.com",  -1);
+        seedLog("WARN",  "Insufficient stock: only 18 units of Mechanical Keyboard (TKL) available in Main Warehouse, 30 requested", "InsufficientStock", "sales@warehouse.com", -2);
+        seedLog("WARN",  "Cannot transition order from FULFILLED to CANCELLED",                   "InvalidOrderState",        "sales@warehouse.com",  -4);
+        seedLog("ERROR", "No class com.warehouse.inventory.model.Product entity with id 9999",    "ResourceNotFoundException", "staff@warehouse.com",  -6);
     }
 
     @Transactional
     public void clear() {
+        jdbc.execute("DELETE FROM app_logs");
         jdbc.execute("DELETE FROM stock_movements");
         jdbc.execute("DELETE FROM order_items");
         jdbc.execute("DELETE FROM customer_orders");
@@ -325,6 +338,11 @@ public class SampleDataService {
     private void setBin(Product product, Warehouse warehouse, String binLocation) {
         jdbc.update("UPDATE inventory_items SET bin_location = ? WHERE product_id = ? AND warehouse_id = ?",
                 binLocation, product.getId(), warehouse.getId());
+    }
+
+    private void seedLog(String level, String message, String context, String triggeredBy, int daysOffset) {
+        jdbc.update("INSERT INTO app_logs (timestamp, level, message, context, triggered_by) VALUES (?, ?, ?, ?, ?)",
+                LocalDateTime.now().plusDays(daysOffset), level, message, context, triggeredBy);
     }
 
     /** Build a product-id → quantity map from alternating Product, int pairs. */

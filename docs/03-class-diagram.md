@@ -143,6 +143,22 @@ classDiagram
         -BigDecimal unitPrice
     }
 
+    class AppLog {
+        -Long id
+        -LocalDateTime timestamp
+        -String level
+        -String message
+        -String context
+        -String triggeredBy
+    }
+
+    class AppLogService {
+        +error(message, context) void
+        +warn(message, context) void
+        +info(message, context) void
+        +getLogs() List~AppLog~
+    }
+
     class InventoryService {
         +adjustStock(productId, warehouseId, delta, reason) InventoryItem
         +transferStock(productId, fromWarehouseId, toWarehouseId, qty) void
@@ -179,6 +195,7 @@ classDiagram
     CustomerOrder "1" --> "many" OrderItem
     CustomerOrder "many" --> "1" OrderStatus
     OrderItem "many" --> "1" Product
+    AppLogService ..> AppLog : creates
     InventoryService ..> InventoryItem : manages
     InventoryService ..> StockMovement : creates
     PurchaseOrderService ..> PurchaseOrder : manages

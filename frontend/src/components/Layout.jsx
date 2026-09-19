@@ -20,6 +20,7 @@ const PAGE_TITLES = {
   '/reports':          'Reports',
   '/profile':          'My Profile',
   '/users':            'User Management',
+  '/system-log':       'System Log',
 }
 
 function navLinks(role) {
@@ -37,6 +38,7 @@ function navLinks(role) {
   if (role === 'ADMIN') {
     all.push({ to: '/categories', label: 'Categories', icon: 'categories' })
     all.push({ to: '/users',      label: 'Users',      icon: 'users' })
+    all.push({ to: '/system-log', label: 'System Log', icon: 'activity' })
   }
   return all
 }

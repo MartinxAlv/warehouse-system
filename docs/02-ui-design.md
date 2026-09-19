@@ -64,13 +64,14 @@ to maximise screen space.
 ### 4. Inventory
 - Table: Product, Warehouse, **Bin Location**, Quantity on Hand, Status (OK/Low/Out),
   Actions.
-- **Bin Location cell**: shows the bin address with a map-pin icon; clicking it opens
-  an inline edit modal to update the text. Unset locations show "Set location" in muted
-  text.
-- **Actions per row**: "Adjust" (opens stock adjustment modal) + printer icon button
-  that opens the **QR Product Label** modal.
-- Transfer Stock button in page header opens a modal: product, from-warehouse,
-  to-warehouse, quantity.
+- **Bin Location cell** *(Admin + Warehouse Staff only)*: shows the bin address with a
+  map-pin icon; clicking it opens an inline edit modal to update the text. Unset
+  locations show "Set location" in muted text. Sales Staff see the bin address as
+  read-only text with no edit affordance.
+- **Actions per row**: "Adjust" *(Admin + Warehouse Staff only)* opens the stock
+  adjustment modal. Printer icon opens the **QR Product Label** modal (all roles).
+- **Transfer Stock** button in page header *(Admin + Warehouse Staff only)* opens a
+  modal: product, from-warehouse, to-warehouse, quantity.
 
 ### 5. QR Product Label (modal, printable)
 - Opens from the printer icon on any Inventory row.
@@ -118,7 +119,14 @@ to maximise screen space.
 - **Admin Tools** panel at the bottom: Load Sample Data / Clear All Data buttons with
   a status badge showing whether sample data is currently loaded.
 
-### 14. Profile (all users)
+### 14. System Log (Admin only)
+- Table: Timestamp, Level badge (ERROR = red, WARN = amber, INFO = blue), Message,
+  Context (which endpoint or action triggered it), Triggered By (username).
+- Read-only — no actions. New entries appear automatically on the next page load.
+- Populated by the backend whenever a business rule violation or unexpected error
+  occurs, and whenever an Admin performs a significant action (seed/clear data).
+
+### 15. Profile (all users)
 - **Account Information** panel: full name, email, role badge.
 - **Change Password** panel: current password + new password form.
 - **Appearance** panel: Dark Mode toggle button (On / Off). Preference saved in

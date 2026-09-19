@@ -88,6 +88,7 @@ export const api = {
   getSampleDataStatus: () => request('/admin/sample-data/status'),
   seedSampleData: () => request('/admin/sample-data/seed', { method: 'POST' }),
   clearAllData: () => request('/admin/sample-data/clear', { method: 'DELETE' }),
+  getSystemLogs: () => request('/admin/logs'),
 
   // customer orders
   getOrders: () => request('/orders'),

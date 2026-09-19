@@ -85,6 +85,12 @@ the Java layer is responsible for enforcing.
 - FR26: The system shall allow filtering/searching products by name, SKU, category, and stock status.
 - FR27: The system shall provide a stock movement history report, filterable by product, warehouse, and date range.
 
+### 3.8 System Event Log
+- FR28: The system shall record a log entry whenever a business rule violation occurs (e.g. insufficient stock, invalid order state transition) or an unexpected server error is thrown.
+- FR29: The system shall record a log entry for significant Admin actions (load sample data, clear all data).
+- FR30: Each log entry shall capture: timestamp, severity level (ERROR / WARN / INFO), message, context, and the username of the user who triggered it.
+- FR31: The system log shall be visible to Admin users only and displayed in reverse chronological order.
+
 ## 4. Non-Functional Requirements
 
 - NFR1: The problem-domain/business logic layer shall be implemented in **Java** (Spring Boot).

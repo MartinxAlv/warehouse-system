@@ -1,5 +1,6 @@
 package com.warehouse.inventory.exception;
 
+import com.warehouse.inventory.service.AppLogService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,6 +18,12 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final AppLogService appLogService;
+
+    public GlobalExceptionHandler(AppLogService appLogService) {
+        this.appLogService = appLogService;
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
         return build(HttpStatus.NOT_FOUND, ex.getMessage());
@@ -24,11 +31,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<Map<String, Object>> handleInsufficientStock(InsufficientStockException ex) {
+        appLogService.warn(ex.getMessage(), "InsufficientStock");
         return build(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidOrderStateException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidState(InvalidOrderStateException ex) {
+        appLogService.warn(ex.getMessage(), "InvalidOrderState");
         return build(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
@@ -62,6 +71,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
+        appLogService.error(ex.getMessage(), ex.getClass().getSimpleName());
         return build(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 

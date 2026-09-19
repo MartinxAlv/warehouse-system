@@ -1592,9 +1592,9 @@ tbody tr:hover { background: #eef2ff; }
   padding: 10px 0;
 }
 
-.sidebar--collapsed .sidebar-user { justify-content: center; gap: 0; }
+.sidebar--collapsed .sidebar-user { justify-content: center; gap: 0; flex-direction: column; }
 .sidebar--collapsed .sidebar-user-info { flex: 0 0 auto; gap: 0; }
-.sidebar--collapsed .sidebar-logout { display: none; }
+.sidebar--collapsed .sidebar-logout { display: flex; }
 
 /* ─── Bin Location Cell ──────────────────────────────────────────────── */
 .bin-location-cell {
@@ -1615,6 +1615,8 @@ tbody tr:hover { background: #eef2ff; }
 
 .bin-location-cell:hover { background: var(--border-lt); }
 .bin-location-cell:hover .bin-edit-icon { opacity: 1; }
+.bin-location-readonly { cursor: default; }
+.bin-location-readonly:hover { background: none; }
 
 .bin-edit-icon {
   opacity: 0;

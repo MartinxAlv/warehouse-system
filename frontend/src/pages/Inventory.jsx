@@ -4,11 +4,14 @@ import Modal from '../components/Modal.jsx'
 import ProductLabel from '../components/ProductLabel.jsx'
 import Icon from '../components/Icon.jsx'
 import { useToast } from '../context/ToastContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 
 const REASONS = ['Damaged', 'Recount', 'Return', 'Theft', 'Expired', 'Restocked', 'Other']
 
 export default function Inventory() {
   const { toast } = useToast()
+  const { user } = useAuth()
+  const canEdit = user?.role === 'ADMIN' || user?.role === 'WAREHOUSE_STAFF'
   const [items, setItems] = useState([])
   const [warehouses, setWarehouses] = useState([])
   const [error, setError] = useState('')
@@ -82,7 +85,7 @@ export default function Inventory() {
           <h1>Inventory</h1>
           <p className="muted small">{items.length} inventory line{items.length !== 1 ? 's' : ''}</p>
         </div>
-        <button className="btn-secondary" onClick={() => setShowTransfer(true)}>Transfer Stock</button>
+        {canEdit && <button className="btn-secondary" onClick={() => setShowTransfer(true)}>Transfer Stock</button>}
       </div>
       {error && <div className="error-banner">{error}</div>}
 
@@ -109,13 +112,22 @@ export default function Inventory() {
                 <td style={{ fontWeight: 500, color: 'var(--text)' }}>{i.product?.name}</td>
                 <td>{i.warehouse?.name}</td>
                 <td>
-                  <button className="bin-location-cell" onClick={() => openLocation(i)} title="Edit bin location">
-                    {i.binLocation
-                      ? <><Icon name="mapPin" size={12} /><span>{i.binLocation}</span></>
-                      : <span className="bin-unset">Set location</span>
-                    }
-                    <Icon name="edit" size={11} className="bin-edit-icon" />
-                  </button>
+                  {canEdit ? (
+                    <button className="bin-location-cell" onClick={() => openLocation(i)} title="Edit bin location">
+                      {i.binLocation
+                        ? <><Icon name="mapPin" size={12} /><span>{i.binLocation}</span></>
+                        : <span className="bin-unset">Set location</span>
+                      }
+                      <Icon name="edit" size={11} className="bin-edit-icon" />
+                    </button>
+                  ) : (
+                    <span className="bin-location-cell bin-location-readonly">
+                      {i.binLocation
+                        ? <><Icon name="mapPin" size={12} /><span>{i.binLocation}</span></>
+                        : <span className="bin-unset">—</span>
+                      }
+                    </span>
+                  )}
                 </td>
                 <td style={{ fontWeight: 600 }}>{i.quantityOnHand}</td>
                 <td>
@@ -125,7 +137,7 @@ export default function Inventory() {
                 </td>
                 <td>
                   <div className="row-actions">
-                    <button className="link-btn" onClick={() => setAdjustTarget(i)}>Adjust</button>
+                    {canEdit && <button className="link-btn" onClick={() => setAdjustTarget(i)}>Adjust</button>}
                     <button className="link-btn" onClick={() => setLabelTarget(i)} title="Print product label">
                       <Icon name="printer" size={13} />
                     </button>

@@ -100,6 +100,15 @@ erDiagram
         decimal unit_price
     }
 
+    APP_LOGS {
+        bigint id PK
+        datetime timestamp
+        varchar level
+        varchar message
+        varchar context
+        varchar triggered_by
+    }
+
     CATEGORIES ||--o{ PRODUCTS : "categorizes"
     PRODUCTS ||--o{ PRODUCT_SUPPLIERS : "supplied via"
     SUPPLIERS ||--o{ PRODUCT_SUPPLIERS : "supplies"

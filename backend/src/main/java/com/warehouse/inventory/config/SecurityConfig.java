@@ -78,6 +78,8 @@ public class SecurityConfig {
                 // Admin + Warehouse staff: stock operations & purchase orders
                 .requestMatchers("/api/inventory/adjust", "/api/inventory/transfer")
                     .hasAnyRole("ADMIN", "WAREHOUSE_STAFF")
+                .requestMatchers(HttpMethod.PATCH, "/api/inventory/**")
+                    .hasAnyRole("ADMIN", "WAREHOUSE_STAFF")
                 .requestMatchers(HttpMethod.POST, "/api/purchase-orders/**")
                     .hasAnyRole("ADMIN", "WAREHOUSE_STAFF")
 

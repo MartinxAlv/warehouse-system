@@ -14,6 +14,7 @@ import StockMovements from './pages/StockMovements.jsx'
 import Profile from './pages/Profile.jsx'
 import Users from './pages/Users.jsx'
 import Reports from './pages/Reports.jsx'
+import SystemLog from './pages/SystemLog.jsx'
 
 function RequireAuth({ children }) {
   const { user } = useAuth()
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/reports"           element={<Reports />} />
           <Route path="/profile"           element={<Profile />} />
           <Route path="/users"             element={<RequireAdmin><Users /></RequireAdmin>} />
+          <Route path="/system-log"        element={<RequireAdmin><SystemLog /></RequireAdmin>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

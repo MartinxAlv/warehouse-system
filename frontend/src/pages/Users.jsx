@@ -75,7 +75,7 @@ export default function Users() {
     setToolWorking(true)
     try {
       await api.seedSampleData()
-      toast('Sample data loaded — 10 products, 9 purchase orders, 15 customer orders, bin locations set')
+      toast('Sample data loaded — 10 products, 9 purchase orders, 15 customer orders, bin locations and system log entries created')
       setDataLoaded(true)
       load()
     } catch (err) {
@@ -259,7 +259,8 @@ export default function Users() {
             <p className="muted small">
               Creates 4 categories, 3 suppliers, 3 warehouses, 10 products, 9 purchase orders,
               and 15 customer orders in various states — plus stock adjustments, warehouse transfers,
-              a full movement log, and bin locations for every inventory item.
+              a full movement log, bin locations for every inventory item, and 6 sample system log
+              entries (INFO, WARN, and ERROR) to demonstrate the error tracking feature.
             </p>
           </div>
           <button

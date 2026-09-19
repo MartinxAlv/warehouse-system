@@ -9,7 +9,7 @@ A full-stack warehouse inventory management system built with **Spring Boot** (J
 ### Authentication & Access Control
 - JWT-based login with secure token storage
 - Three user roles with different permissions:
-  - **Admin** — full access including user management, categories, and admin tools
+  - **Admin** — full access including user management, categories, admin tools, and system log
   - **Warehouse Staff** — inventory operations, purchase orders, stock adjustments
   - **Sales Staff** — customer orders only
 - Demo accounts pre-seeded on first run
@@ -59,6 +59,13 @@ A full-stack warehouse inventory management system built with **Spring Boot** (J
 - Create, edit, and deactivate user accounts
 - Assign and change roles
 - Password reset from the admin panel
+
+### System Event Log (Admin only)
+- Every business rule violation is automatically recorded: insufficient stock, invalid order state transitions, unexpected server errors
+- Admin actions (load/clear sample data) are logged as INFO events
+- Each entry captures: timestamp, severity level (ERROR / WARN / INFO), message, context, and the user who triggered it
+- Viewable from the sidebar under System Log — read-only, newest first
+- Sample log entries are included in the sample dataset so the page is never empty during a demo
 
 ### Profile & Appearance
 - Every user can change their own password from the Profile page
@@ -287,6 +294,7 @@ A green **Data loaded** badge confirms the data is present. A grey **Empty** bad
 | Customer Orders | 15 | 7 Fulfilled, 3 Confirmed, 3 Pending, 2 Cancelled |
 | Stock Movements | Full log | All PO receipts, sales, manual adjustments, and transfers |
 | Bin Locations | 21 | Every inventory line has a pre-set bin address (e.g. "Aisle A · Row 1 · Bin 3") |
+| System Log Entries | 6 | 3× INFO, 2× WARN, 1× ERROR — realistic examples across different timestamps |
 
 Three inventory lines are intentionally set to **Low Stock** so the dashboard and reports show realistic alerts immediately.
 
@@ -306,7 +314,8 @@ After loading sample data, log in as **Admin** and explore:
 4. **Purchase Orders** — view received/submitted/draft POs, create and receive a new one
 5. **Customer Orders** — view the full fulfillment pipeline, create and fulfill an order
 6. **Stock Log** — full timestamped audit trail of every stock movement
-7. **Profile** — toggle dark mode under Appearance, change your password
+7. **System Log** — see the pre-seeded ERROR, WARN, and INFO entries; then trigger a real one by trying to over-fulfill an order
+8. **Profile** — toggle dark mode under Appearance, change your password
 
 Or follow the full manual workflow from scratch:
 
@@ -417,6 +426,7 @@ All endpoints are under `http://localhost:8080/api/`. Protected endpoints requir
 | GET | `/admin/sample-data/status` | Admin | Check if sample data is loaded |
 | POST | `/admin/sample-data/seed` | Admin | Load sample data |
 | DELETE | `/admin/sample-data/clear` | Admin | Clear all data |
+| GET | `/admin/logs` | Admin | View system event log |
 
 ---
 
