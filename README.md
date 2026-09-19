@@ -408,6 +408,7 @@ All endpoints are under `http://localhost:8080/api/`. Protected endpoints requir
 | GET | `/products/all` | Admin | List all products including inactive |
 | POST | `/products` | Admin | Create product |
 | PUT | `/products/{id}` | Admin | Update product |
+| DELETE | `/products/{id}` | Admin | Deactivate product (soft delete) |
 | POST | `/products/{id}/reactivate` | Admin | Reactivate a deactivated product |
 | GET | `/inventory` | All | List inventory with bin locations |
 | POST | `/inventory/adjust` | Admin, Warehouse | Manual stock adjustment |
