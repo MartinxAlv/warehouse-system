@@ -2,6 +2,7 @@ package com.warehouse.inventory.controller;
 
 import com.warehouse.inventory.model.Product;
 import com.warehouse.inventory.service.ProductService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,8 +45,20 @@ public class ProductController {
         return productService.updateProduct(id, updated);
     }
 
+    @GetMapping("/all")
+    public List<Product> getAllIncludingInactive() {
+        return productService.getAllProducts();
+    }
+
     @DeleteMapping("/{id}")
-    public void deactivate(@PathVariable Long id) {
+    public ResponseEntity<Void> deactivate(@PathVariable Long id) {
         productService.deactivateProduct(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/reactivate")
+    public Product reactivate(@PathVariable Long id) {
+        productService.reactivateProduct(id);
+        return productService.getProduct(id);
     }
 }

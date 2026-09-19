@@ -3,16 +3,20 @@ import { api } from '../api/client.js'
 import Modal from '../components/Modal.jsx'
 import ConfirmModal from '../components/ConfirmModal.jsx'
 import { useToast } from '../context/ToastContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 
 const EMPTY = { sku: '', name: '', description: '', price: '', reorderThreshold: 10, categoryId: '' }
 
 export default function Products() {
   const { toast } = useToast()
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'ADMIN'
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [filterCategory, setFilterCategory] = useState('')
+  const [showInactive, setShowInactive] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editProduct, setEditProduct] = useState(null)
   const [confirmTarget, setConfirmTarget] = useState(null)
@@ -20,12 +24,13 @@ export default function Products() {
   const [editForm, setEditForm] = useState(EMPTY)
 
   function load() {
-    Promise.all([api.getProducts(), api.getCategories()])
+    const fetchProducts = isAdmin && showInactive ? api.getAllProducts() : api.getProducts()
+    Promise.all([fetchProducts, api.getCategories()])
       .then(([p, c]) => { setProducts(p); setCategories(c) })
       .catch((e) => setError(e.message))
   }
 
-  useEffect(load, [])
+  useEffect(load, [showInactive])
 
   async function handleCreate(e) {
     e.preventDefault()
@@ -70,6 +75,16 @@ export default function Products() {
     try {
       await api.deactivateProduct(p.id)
       toast(`${p.name} deactivated`, 'info')
+      load()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  async function handleReactivate(p) {
+    try {
+      await api.reactivateProduct(p.id)
+      toast(`${p.name} reactivated`)
       load()
     } catch (err) {
       setError(err.message)
@@ -144,26 +159,46 @@ export default function Products() {
         {(search || filterCategory) && (
           <button className="link-btn" onClick={() => { setSearch(''); setFilterCategory('') }}>Clear</button>
         )}
+        {isAdmin && (
+          <button
+            className={showInactive ? 'btn-primary' : 'btn-secondary'}
+            style={{ marginLeft: 'auto' }}
+            onClick={() => setShowInactive(v => !v)}
+          >
+            {showInactive ? 'Hiding inactive' : 'Show inactive'}
+          </button>
+        )}
       </div>
 
       <table>
         <thead>
-          <tr><th>SKU</th><th>Name</th><th>Category</th><th>Price</th><th>Reorder At</th><th></th></tr>
+          <tr><th>SKU</th><th>Name</th><th>Category</th><th>Price</th><th>Reorder At</th><th>Status</th><th></th></tr>
         </thead>
         <tbody>
           {filtered.length === 0 && (
-            <tr><td colSpan={6} className="empty-state">No products match your filters.</td></tr>
+            <tr><td colSpan={7} className="empty-state">No products match your filters.</td></tr>
           )}
           {filtered.map((p) => (
-            <tr key={p.id}>
+            <tr key={p.id} style={!p.active ? { opacity: 0.5 } : {}}>
               <td><code className="sku-code">{p.sku}</code></td>
               <td>{p.name}</td>
               <td><span className="badge badge-gray">{p.category?.name ?? '—'}</span></td>
               <td>${Number(p.price).toFixed(2)}</td>
               <td>{p.reorderThreshold}</td>
+              <td>
+                <span className={`badge ${p.active ? 'badge-green' : 'badge-gray'}`}>
+                  {p.active ? 'Active' : 'Inactive'}
+                </span>
+              </td>
               <td className="row-actions">
-                <button className="link-btn" title="Edit this product's details" onClick={() => openEdit(p)}>Edit</button>
-                <button className="link-btn danger" title="Deactivate this product — it will be hidden from the catalog" onClick={() => setConfirmTarget(p)}>Deactivate</button>
+                {p.active ? (
+                  <>
+                    <button className="link-btn" title="Edit this product" onClick={() => openEdit(p)}>Edit</button>
+                    <button className="link-btn danger" title="Deactivate this product" onClick={() => setConfirmTarget(p)}>Deactivate</button>
+                  </>
+                ) : (
+                  <button className="link-btn" title="Restore this product to the catalog" onClick={() => handleReactivate(p)}>Reactivate</button>
+                )}
               </td>
             </tr>
           ))}

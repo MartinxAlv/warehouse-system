@@ -48,11 +48,11 @@ the Java layer is responsible for enforcing.
 - FR3: An Admin shall be able to create, edit, deactivate, and delete user accounts.
 
 ### 3.2 Product & Category Management
-- FR4: The system shall allow Admins to create, edit, and deactivate products.
+- FR4: The system shall allow Admins to create, edit, deactivate, and reactivate products.
 - FR5: Each product shall belong to exactly one category.
 - FR6: The system shall allow Admins to manage categories (create/edit/delete).
 - FR7: Each product shall have a unique SKU, generated or entered on creation.
-- FR8: The system shall prevent deleting a product that has existing order or stock history (soft delete / deactivate instead).
+- FR8: The system shall prevent deleting a product that has existing order or stock history (soft delete / deactivate instead). Deactivated products can be reactivated by an Admin at any time.
 
 ### 3.3 Supplier Management
 - FR9: The system shall allow Admins to create, edit, and deactivate suppliers.

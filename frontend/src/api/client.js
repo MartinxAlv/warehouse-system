@@ -23,7 +23,8 @@ async function request(path, options = {}) {
     throw new Error(body.message || `Request failed: ${res.status}`);
   }
   if (res.status === 204) return null;
-  return res.json();
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
 export const api = {
@@ -42,6 +43,8 @@ export const api = {
 
   // products
   getProducts: () => request('/products'),
+  getAllProducts: () => request('/products/all'),
+  reactivateProduct: (id) => request(`/products/${id}/reactivate`, { method: 'POST' }),
   getProduct: (id) => request(`/products/${id}`),
   createProduct: (data) => request('/products', { method: 'POST', body: JSON.stringify(data) }),
   updateProduct: (id, data) => request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(data) }),

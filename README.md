@@ -42,7 +42,8 @@ A full-stack warehouse inventory management system built with **Spring Boot** (J
 ### Products & Categories
 - Full product catalog with SKU, price, category, and reorder threshold
 - Search and filter products by name, SKU, or category
-- Edit and deactivate products
+- Edit, deactivate, and reactivate products (soft delete — data is always preserved)
+- Toggle to show/hide deactivated products (Admin only)
 - Category management (Admin only)
 
 ### Suppliers & Warehouses
@@ -403,9 +404,11 @@ All endpoints are under `http://localhost:8080/api/`. Protected endpoints requir
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
 | POST | `/auth/login` | Public | Returns JWT token |
-| GET | `/products` | All | List products |
+| GET | `/products` | All | List active products |
+| GET | `/products/all` | Admin | List all products including inactive |
 | POST | `/products` | Admin | Create product |
 | PUT | `/products/{id}` | Admin | Update product |
+| POST | `/products/{id}/reactivate` | Admin | Reactivate a deactivated product |
 | GET | `/inventory` | All | List inventory with bin locations |
 | POST | `/inventory/adjust` | Admin, Warehouse | Manual stock adjustment |
 | POST | `/inventory/transfer` | Admin, Warehouse | Transfer between warehouses |

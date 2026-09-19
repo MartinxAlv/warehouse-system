@@ -60,10 +60,23 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
+    @Override
     @Transactional
     public void deactivateProduct(Long id) {
         Product product = getProduct(id);
         product.setActive(false);
+        productRepository.save(product);
+    }
+
+    @Override
+    @Transactional
+    public void reactivateProduct(Long id) {
+        Product product = getProduct(id);
+        product.setActive(true);
         productRepository.save(product);
     }
 }

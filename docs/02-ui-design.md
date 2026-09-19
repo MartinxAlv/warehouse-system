@@ -56,10 +56,16 @@ to maximise screen space.
 - **Recent Activity feed**: latest stock movements (type, product, qty, timestamp).
 
 ### 3. Products
-- Table: SKU, Name, Category, Price, Status (Active/Inactive), actions (Edit).
-- Search bar filters by name, SKU, or category inline.
+- Table: SKU, Name, Category, Price, Reorder At, Status (Active/Inactive), actions.
+- Search bar filters by name or SKU inline; category dropdown filters by category.
+- **Show inactive** toggle button *(Admin only)* — when on, fetches all products
+  including deactivated ones. Inactive rows appear dimmed with a grey "Inactive" badge.
+  Active products show Edit + Deactivate buttons; inactive products show a Reactivate
+  button instead.
 - "Add Product" opens a modal: name, SKU, category dropdown, price, description,
   reorder threshold.
+- Deactivated products are soft-deleted (the `active` flag is set to false, the row is
+  kept in the database) so historical order and stock data is always preserved.
 
 ### 4. Inventory
 - Table: Product, Warehouse, **Bin Location**, Quantity on Hand, Status (OK/Low/Out),
