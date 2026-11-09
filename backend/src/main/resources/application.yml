@@ -5,26 +5,26 @@ spring:
   application:
     name: inventory-management
   datasource:
-    url: jdbc:mysql://localhost:3306/warehouse_inventory?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
-    username: root
-    password: ""
+    url: ${DB_URL:jdbc:mysql://localhost:3306/warehouse_inventory?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
     open-in-view: false
 
 logging:
   level:
-    com.warehouse.inventory: DEBUG
+    com.warehouse.inventory: INFO
 
 app:
   cors:
-    allowed-origin: http://localhost:5173
+    allowed-origin: ${CORS_ORIGIN:http://localhost:5173}
   jwt:
-    secret: "warehouse-inventory-jwt-secret-key-for-development-only-min32chars"
+    secret: ${JWT_SECRET:warehouse-inventory-jwt-secret-key-for-development-only-min32chars}
     expiration: 86400000
