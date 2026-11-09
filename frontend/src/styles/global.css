@@ -165,8 +165,8 @@ body {
 .content {
   flex: 1;
   padding: 28px 36px 32px;
-  max-width: 1160px;
   width: 100%;
+  min-width: 0;
 }
 
 /* ─── Breadcrumb ────────────────────────────────────────────────────── */
