@@ -227,13 +227,27 @@ export default function PurchaseOrders() {
               <span>Supplier:</span>
               <strong>{receiveTarget.supplier?.name}</strong>
             </div>
+            <div>
+              <p className="muted small" style={{ marginBottom: 6 }}>Items being received:</p>
+              <table className="inner-table">
+                <thead><tr><th>Product</th><th>Qty</th></tr></thead>
+                <tbody>
+                  {(receiveTarget.items ?? []).map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.product?.name ?? `#${item.productId}`}</td>
+                      <td>{item.quantityOrdered - item.quantityReceived}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <label>
               Receive Into Warehouse
               <select required value={receiveWarehouseId} onChange={(e) => setReceiveWarehouseId(e.target.value)}>
                 <option value="">Select warehouse…</option>
                 {warehouses.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
               </select>
-              <span className="field-hint">Stock from all line items will be added to this warehouse</span>
+              <span className="field-hint">All items above will be added to this warehouse</span>
             </label>
             <div className="form-actions">
               <button type="button" className="btn-secondary" onClick={() => { setReceiveTarget(null); setReceiveWarehouseId('') }}>Cancel</button>
