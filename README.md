@@ -458,7 +458,7 @@ Use this option if you want to run the app without installing Java, Maven, MySQL
 ### Step 1 — Clone the repo
 
 ```bash
-git clone https://github.com/your-username/warehouse-system.git
+git clone https://github.com/MartinxAlv/warehouse-system.git
 cd warehouse-system
 ```
 
