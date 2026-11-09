@@ -222,6 +222,13 @@ export default function Inventory() {
                 {products.map((p) => <option key={p.id} value={p.id}>{p.name} ({p.sku})</option>)}
               </select>
             </label>
+            {transferForm.productId && (
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '-4px' }}>
+                {items.filter(i => String(i.product.id) === String(transferForm.productId)).map(i => (
+                  <span key={i.id}><strong style={{ color: 'var(--text)' }}>{i.warehouse.name}:</strong> {i.quantityOnHand} units</span>
+                ))}
+              </div>
+            )}
             <div className="form-row-2">
               <label>From Warehouse
                 <select required value={transferForm.fromWarehouseId} onChange={(e) => setTransferForm({ ...transferForm, fromWarehouseId: e.target.value })}>
