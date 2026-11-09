@@ -65,7 +65,7 @@ export default function Products() {
   async function handleCreate(e) {
     e.preventDefault()
     try {
-      await api.createProduct({ ...form, price: Number(form.price), categoryId: Number(form.categoryId) })
+      await api.createProduct({ ...form, price: Number(form.price), categoryId: Number(form.categoryId), reorderThreshold: Number(form.reorderThreshold) })
       toast('Product created')
       setShowForm(false)
       setForm(EMPTY)
@@ -91,7 +91,7 @@ export default function Products() {
     e.preventDefault()
     try {
       await api.updateProduct(editProduct.id, {
-        ...editForm, price: Number(editForm.price), categoryId: Number(editForm.categoryId),
+        ...editForm, price: Number(editForm.price), categoryId: Number(editForm.categoryId), reorderThreshold: Number(editForm.reorderThreshold),
       })
       toast('Product updated')
       setEditProduct(null)
