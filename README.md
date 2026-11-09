@@ -148,7 +148,7 @@ There are two ways to run this project — pick the one that fits your situation
 
 | | Option A — Local | Option B — Docker |
 |---|---|---|
-| **Best for** | Development / testing on your own machine | Deploying on a VPS or sharing a live URL |
+| **Best for** | Development / testing on your own machine | Running locally without installing Java/MySQL, or deploying on a VPS |
 | **Requires** | Java, Maven, MySQL, Node installed locally | Docker and Docker Compose only |
 | **Setup time** | A few minutes | A few minutes |
 
@@ -448,7 +448,7 @@ All endpoints are under `http://localhost:8080/api/`. Protected endpoints requir
 
 ## Option B — Run with Docker
 
-This is the recommended way to deploy on a VPS (DigitalOcean, Linode, etc.). Docker handles MySQL, the backend, and the frontend — you don't need Java, Maven, or Node installed on the server.
+Use this option if you want to run the app without installing Java, Maven, MySQL, or Node on your machine — Docker handles everything. It also works for deploying on a VPS (DigitalOcean, Linode, etc.).
 
 ### Prerequisites
 
@@ -478,7 +478,7 @@ JWT_SECRET=a_random_string_at_least_32_characters_long
 CORS_ORIGIN=http://your-server-ip-or-domain
 ```
 
-> `CORS_ORIGIN` should be the address your users will visit — e.g. `http://165.22.123.45` or `https://stockwell.example.com`. For local Docker testing, use `http://localhost`.
+> `CORS_ORIGIN` is the address you'll open in your browser. Use `http://localhost` if running Docker locally, or your server's IP/domain if deploying on a VPS (e.g. `http://165.22.123.45`).
 
 ### Step 3 — Build and start
 
