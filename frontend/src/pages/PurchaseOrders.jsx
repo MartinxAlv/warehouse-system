@@ -22,6 +22,8 @@ export default function PurchaseOrders() {
   const [showForm, setShowForm] = useState(false)
   const [detailOrder, setDetailOrder] = useState(null)
   const [cancelTarget, setCancelTarget] = useState(null)
+  const [receiveTarget, setReceiveTarget] = useState(null)
+  const [receiveWarehouseId, setReceiveWarehouseId] = useState('')
   const [supplierId, setSupplierId] = useState('')
   const [items, setItems] = useState([{ ...EMPTY_ITEM }])
 
@@ -67,13 +69,27 @@ export default function PurchaseOrders() {
     catch (err) { setError(err.message) }
   }
 
-  async function receiveFull(order) {
-    const warehouseId = warehouses[0]?.id
-    if (!warehouseId) return setError('Create a warehouse first')
+  async function receiveFull(order, warehouseId) {
     const receivedQuantitiesByItemId = {}
     order.items.forEach((i) => { receivedQuantitiesByItemId[i.id] = i.quantityOrdered - i.quantityReceived })
-    try { await api.receivePurchaseOrder(order.id, { warehouseId, receivedQuantitiesByItemId }); toast('Goods received — inventory updated'); load() }
-    catch (err) { setError(err.message) }
+    try {
+      await api.receivePurchaseOrder(order.id, { warehouseId: Number(warehouseId), receivedQuantitiesByItemId })
+      toast('Goods received — inventory updated')
+      setReceiveTarget(null)
+      setReceiveWarehouseId('')
+      load()
+    } catch (err) { setError(err.message) }
+  }
+
+  function openReceive(order) {
+    setReceiveWarehouseId(warehouses[0]?.id ?? '')
+    setReceiveTarget(order)
+  }
+
+  async function submitReceive(e) {
+    e.preventDefault()
+    if (!receiveWarehouseId) return
+    await receiveFull(receiveTarget, receiveWarehouseId)
   }
 
   return (
@@ -115,7 +131,7 @@ export default function PurchaseOrders() {
                     className="link-btn"
                     disabled={!canReceive}
                     title={!canReceive ? 'Order must be Submitted or Partially Received' : 'Mark goods as received'}
-                    onClick={() => receiveFull(o)}
+                    onClick={() => openReceive(o)}
                   >Receive</button>
                   <button
                     className="link-btn danger"
@@ -197,10 +213,33 @@ export default function PurchaseOrders() {
             </table>
             <div className="detail-footer">
               <button className="link-btn" disabled={detailOrder.status !== 'DRAFT'} onClick={() => { submitOrder(detailOrder.id); setDetailOrder(null) }}>Submit</button>
-              <button className="link-btn" disabled={detailOrder.status !== 'SUBMITTED' && detailOrder.status !== 'PARTIALLY_RECEIVED'} onClick={() => { receiveFull(detailOrder); setDetailOrder(null) }}>Receive All</button>
+              <button className="link-btn" disabled={detailOrder.status !== 'SUBMITTED' && detailOrder.status !== 'PARTIALLY_RECEIVED'} onClick={() => { setDetailOrder(null); openReceive(detailOrder) }}>Receive All</button>
               <button className="btn-danger" disabled={detailOrder.status === 'RECEIVED' || detailOrder.status === 'CANCELLED'} onClick={() => { setDetailOrder(null); setCancelTarget(detailOrder) }}>Cancel Order</button>
             </div>
           </div>
+        </Modal>
+      )}
+
+      {receiveTarget && (
+        <Modal title={`Receive PO #${receiveTarget.id}`} onClose={() => { setReceiveTarget(null); setReceiveWarehouseId('') }}>
+          <form onSubmit={submitReceive} className="stacked-form">
+            <div className="adjust-info">
+              <span>Supplier:</span>
+              <strong>{receiveTarget.supplier?.name}</strong>
+            </div>
+            <label>
+              Receive Into Warehouse
+              <select required value={receiveWarehouseId} onChange={(e) => setReceiveWarehouseId(e.target.value)}>
+                <option value="">Select warehouse…</option>
+                {warehouses.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+              </select>
+              <span className="field-hint">Stock from all line items will be added to this warehouse</span>
+            </label>
+            <div className="form-actions">
+              <button type="button" className="btn-secondary" onClick={() => { setReceiveTarget(null); setReceiveWarehouseId('') }}>Cancel</button>
+              <button type="submit" className="btn-primary">Confirm Receipt</button>
+            </div>
+          </form>
         </Modal>
       )}
 
