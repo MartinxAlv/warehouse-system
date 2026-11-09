@@ -7,6 +7,36 @@ import { useAuth } from '../context/AuthContext.jsx'
 
 const EMPTY = { sku: '', name: '', description: '', price: '', reorderThreshold: 10, categoryId: '' }
 
+function ProductForm({ data, setData, onSubmit, submitLabel, onCancel, categories }) {
+  return (
+    <form onSubmit={onSubmit} className="stacked-form">
+      <div className="form-row-2">
+        <label>SKU<input required value={data.sku} onChange={(e) => setData({ ...data, sku: e.target.value })} /></label>
+        <label>Category
+          <select required value={data.categoryId} onChange={(e) => setData({ ...data, categoryId: e.target.value })}>
+            <option value="">Select…</option>
+            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </label>
+      </div>
+      <label>Name<input required value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} /></label>
+      <label>Description<textarea value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} /></label>
+      <div className="form-row-2">
+        <label>Price ($)<input required type="number" step="0.01" min="0" value={data.price} onChange={(e) => setData({ ...data, price: e.target.value })} /></label>
+        <label>
+          Reorder Threshold
+          <input type="number" min="0" value={data.reorderThreshold} onChange={(e) => setData({ ...data, reorderThreshold: e.target.value })} />
+          <span className="field-hint">System will flag low stock below this quantity</span>
+        </label>
+      </div>
+      <div className="form-actions">
+        <button type="button" className="btn-secondary" onClick={onCancel}>Cancel</button>
+        <button type="submit" className="btn-primary">{submitLabel}</button>
+      </div>
+    </form>
+  )
+}
+
 export default function Products() {
   const { toast } = useToast()
   const { user } = useAuth()
@@ -98,36 +128,6 @@ export default function Products() {
     return matchSearch && matchCat
   })
 
-  function ProductForm({ data, setData, onSubmit, submitLabel, onCancel }) {
-    return (
-      <form onSubmit={onSubmit} className="stacked-form">
-        <div className="form-row-2">
-          <label>SKU<input required value={data.sku} onChange={(e) => setData({ ...data, sku: e.target.value })} /></label>
-          <label>Category
-            <select required value={data.categoryId} onChange={(e) => setData({ ...data, categoryId: e.target.value })}>
-              <option value="">Select…</option>
-              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </label>
-        </div>
-        <label>Name<input required value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} /></label>
-        <label>Description<textarea value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} /></label>
-        <div className="form-row-2">
-          <label>Price ($)<input required type="number" step="0.01" min="0" value={data.price} onChange={(e) => setData({ ...data, price: e.target.value })} /></label>
-          <label>
-            Reorder Threshold
-            <input type="number" min="0" value={data.reorderThreshold} onChange={(e) => setData({ ...data, reorderThreshold: e.target.value })} />
-            <span className="field-hint">System will flag low stock below this quantity</span>
-          </label>
-        </div>
-        <div className="form-actions">
-          <button type="button" className="btn-secondary" onClick={onCancel}>Cancel</button>
-          <button type="submit" className="btn-primary">{submitLabel}</button>
-        </div>
-      </form>
-    )
-  }
-
   return (
     <div>
       <div className="page-header">
@@ -207,13 +207,13 @@ export default function Products() {
 
       {showForm && (
         <Modal title="Add Product" onClose={() => setShowForm(false)}>
-          <ProductForm data={form} setData={setForm} onSubmit={handleCreate} submitLabel="Create Product" onCancel={() => setShowForm(false)} />
+          <ProductForm data={form} setData={setForm} onSubmit={handleCreate} submitLabel="Create Product" onCancel={() => setShowForm(false)} categories={categories} />
         </Modal>
       )}
 
       {editProduct && (
         <Modal title="Edit Product" onClose={() => setEditProduct(null)}>
-          <ProductForm data={editForm} setData={setEditForm} onSubmit={handleEdit} submitLabel="Save Changes" onCancel={() => setEditProduct(null)} />
+          <ProductForm data={editForm} setData={setEditForm} onSubmit={handleEdit} submitLabel="Save Changes" onCancel={() => setEditProduct(null)} categories={categories} />
         </Modal>
       )}
 
