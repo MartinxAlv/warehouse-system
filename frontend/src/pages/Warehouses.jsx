@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react'
 import { api } from '../api/client.js'
 import Modal from '../components/Modal.jsx'
 import { useToast } from '../context/ToastContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 
 export default function Warehouses() {
   const { toast } = useToast()
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'ADMIN'
   const [warehouses, setWarehouses] = useState([])
   const [inventory, setInventory] = useState([])
   const [error, setError] = useState('')
@@ -42,7 +45,7 @@ export default function Warehouses() {
     <div>
       <div className="page-header">
         <h1>Warehouses</h1>
-        <button className="btn-primary" onClick={() => setShowForm(true)}>+ Add Warehouse</button>
+        {isAdmin && <button className="btn-primary" onClick={() => setShowForm(true)}>+ Add Warehouse</button>}
       </div>
       {error && <div className="error-banner">{error}</div>}
 
