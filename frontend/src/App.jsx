@@ -32,6 +32,17 @@ function RequireAdmin({ children }) {
   return children
 }
 
+function RequireRole({ roles, children }) {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" replace />
+  if (!roles.includes(user.role)) return (
+    <div className="content">
+      <div className="error-banner">Your role does not have access to this page.</div>
+    </div>
+  )
+  return children
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -41,11 +52,11 @@ export default function App() {
           <Route path="/"                  element={<Dashboard />} />
           <Route path="/products"          element={<Products />} />
           <Route path="/inventory"         element={<Inventory />} />
-          <Route path="/stock-movements"   element={<StockMovements />} />
-          <Route path="/purchase-orders"   element={<PurchaseOrders />} />
-          <Route path="/orders"            element={<CustomerOrders />} />
-          <Route path="/suppliers"         element={<Suppliers />} />
-          <Route path="/warehouses"        element={<Warehouses />} />
+          <Route path="/stock-movements"   element={<RequireRole roles={['ADMIN','WAREHOUSE_STAFF']}><StockMovements /></RequireRole>} />
+          <Route path="/purchase-orders"   element={<RequireRole roles={['ADMIN','WAREHOUSE_STAFF']}><PurchaseOrders /></RequireRole>} />
+          <Route path="/orders"            element={<RequireRole roles={['ADMIN','SALES_STAFF']}><CustomerOrders /></RequireRole>} />
+          <Route path="/suppliers"         element={<RequireAdmin><Suppliers /></RequireAdmin>} />
+          <Route path="/warehouses"        element={<RequireRole roles={['ADMIN','WAREHOUSE_STAFF']}><Warehouses /></RequireRole>} />
           <Route path="/categories"        element={<RequireAdmin><Categories /></RequireAdmin>} />
           <Route path="/reports"           element={<Reports />} />
           <Route path="/profile"           element={<Profile />} />

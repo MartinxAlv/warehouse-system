@@ -24,23 +24,32 @@ const PAGE_TITLES = {
 }
 
 function navLinks(role) {
-  const all = [
-    { to: '/',                label: 'Dashboard',       icon: 'dashboard',       end: true },
-    { to: '/products',        label: 'Products',         icon: 'products' },
-    { to: '/inventory',       label: 'Inventory',        icon: 'inventory' },
-    { to: '/stock-movements', label: 'Stock Log',        icon: 'movements' },
-    { to: '/purchase-orders', label: 'Purchase Orders',  icon: 'purchaseOrders' },
-    { to: '/orders',          label: 'Customer Orders',  icon: 'customerOrders' },
-    { to: '/suppliers',       label: 'Suppliers',        icon: 'suppliers' },
-    { to: '/warehouses',      label: 'Warehouses',       icon: 'warehouses' },
-    { to: '/reports',         label: 'Reports',          icon: 'reports' },
+  const links = [
+    { to: '/',          label: 'Dashboard', icon: 'dashboard', end: true },
+    { to: '/products',  label: 'Products',  icon: 'products' },
+    { to: '/inventory', label: 'Inventory', icon: 'inventory' },
   ]
-  if (role === 'ADMIN') {
-    all.push({ to: '/categories', label: 'Categories', icon: 'categories' })
-    all.push({ to: '/users',      label: 'Users',      icon: 'users' })
-    all.push({ to: '/system-log', label: 'System Log', icon: 'activity' })
+
+  if (role === 'ADMIN' || role === 'WAREHOUSE_STAFF') {
+    links.push({ to: '/stock-movements', label: 'Stock Log',       icon: 'movements' })
+    links.push({ to: '/purchase-orders', label: 'Purchase Orders', icon: 'purchaseOrders' })
+    links.push({ to: '/warehouses',      label: 'Warehouses',      icon: 'warehouses' })
   }
-  return all
+
+  if (role === 'ADMIN' || role === 'SALES_STAFF') {
+    links.push({ to: '/orders', label: 'Customer Orders', icon: 'customerOrders' })
+  }
+
+  links.push({ to: '/reports', label: 'Reports', icon: 'reports' })
+
+  if (role === 'ADMIN') {
+    links.push({ to: '/suppliers',   label: 'Suppliers',   icon: 'suppliers' })
+    links.push({ to: '/categories',  label: 'Categories',  icon: 'categories' })
+    links.push({ to: '/users',       label: 'Users',       icon: 'users' })
+    links.push({ to: '/system-log',  label: 'System Log',  icon: 'activity' })
+  }
+
+  return links
 }
 
 function Breadcrumb() {

@@ -10,20 +10,36 @@
 │  > Dashboard       │                                      │
 │  > Products        │                                      │
 │  > Inventory       │                                      │
-│  > Stock Log       │                                      │
-│  > Purchase Orders │                                      │
-│  > Customer Orders │                                      │
-│  > Suppliers       │                                      │
-│  > Warehouses      │                                      │
+│  > Stock Log    †  │                                      │
+│  > Purchase Orders │  † Warehouse Staff + Admin only      │
+│  > Warehouses   †  │                                      │
+│  > Customer Orders ‡  ‡ Sales Staff + Admin only          │
 │  > Reports         │                                      │
-│  > Categories*     │                                      │
-│  > Users*          │                                      │
-│  > System Log*     │                                      │
+│  > Suppliers    *  │  * Admin only                        │
+│  > Categories   *  │                                      │
+│  > Users        *  │                                      │
+│  > System Log   *  │                                      │
 │  ─────────────     │                                      │
 │  [A] Admin    ↩    │                                      │
 └──────────────────────────────────────────────────────────┘
-  * Admin only
 ```
+
+**Role-based sidebar:** Each role sees only the pages relevant to their job.
+
+| Page             | Admin | Warehouse Staff | Sales Staff |
+|------------------|:-----:|:---------------:|:-----------:|
+| Dashboard        | ✓     | ✓               | ✓           |
+| Products         | ✓     | ✓ (read-only)   | ✓ (read-only) |
+| Inventory        | ✓     | ✓               | ✓ (read-only) |
+| Stock Log        | ✓     | ✓               | —           |
+| Purchase Orders  | ✓     | ✓               | —           |
+| Warehouses       | ✓     | ✓               | —           |
+| Customer Orders  | ✓     | —               | ✓           |
+| Reports          | ✓     | ✓               | ✓           |
+| Suppliers        | ✓     | —               | —           |
+| Categories       | ✓     | —               | —           |
+| Users            | ✓     | —               | —           |
+| System Log       | ✓     | —               | —           |
 
 All authenticated pages share this shell: a fixed left sidebar for navigation, and a
 main content area that scrolls independently. The sidebar collapses to icon-only mode

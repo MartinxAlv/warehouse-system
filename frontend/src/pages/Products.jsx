@@ -41,6 +41,7 @@ export default function Products() {
   const { toast } = useToast()
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
+  const canEdit = isAdmin
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [error, setError] = useState('')
@@ -157,10 +158,13 @@ export default function Products() {
     <div>
       <div className="page-header">
         <div>
-          <h1>Products</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h1>Products</h1>
+            {!canEdit && <span className="badge badge-gray">Read-only</span>}
+          </div>
           <p className="muted small">{filtered.length} of {products.length} product{products.length !== 1 ? 's' : ''}</p>
         </div>
-        <button className="btn-primary" onClick={() => setShowForm(true)}>+ Add Product</button>
+        {canEdit && <button className="btn-primary" onClick={() => setShowForm(true)}>+ Add Product</button>}
       </div>
 
       {error && <div className="error-banner">{error}</div>}
@@ -216,14 +220,14 @@ export default function Products() {
                 </span>
               </td>
               <td className="row-actions">
-                {p.active ? (
+                {canEdit && (p.active ? (
                   <>
                     <button className="link-btn" title="Edit this product" onClick={() => openEdit(p)}>Edit</button>
                     <button className="link-btn danger" title="Deactivate this product" onClick={() => setConfirmTarget(p)}>Deactivate</button>
                   </>
                 ) : (
                   <button className="link-btn" title="Restore this product to the catalog" onClick={() => handleReactivate(p)}>Reactivate</button>
-                )}
+                ))}
               </td>
             </tr>
           ))}

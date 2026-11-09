@@ -112,7 +112,10 @@ export default function Inventory() {
     <div>
       <div className="page-header">
         <div>
-          <h1>Inventory</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h1>Inventory</h1>
+            {!canEdit && <span className="badge badge-gray">Read-only</span>}
+          </div>
           <p className="muted small" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {filtered.length} of {items.length} inventory line{items.length !== 1 ? 's' : ''}
             {items.filter(i => i.quantityOnHand > 0 && i.quantityOnHand <= (i.product?.reorderThreshold ?? 0)).length > 0 && (
