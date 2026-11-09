@@ -54,7 +54,7 @@ export default function App() {
           <Route path="/inventory"         element={<Inventory />} />
           <Route path="/stock-movements"   element={<RequireRole roles={['ADMIN','WAREHOUSE_STAFF']}><StockMovements /></RequireRole>} />
           <Route path="/purchase-orders"   element={<RequireRole roles={['ADMIN','WAREHOUSE_STAFF']}><PurchaseOrders /></RequireRole>} />
-          <Route path="/orders"            element={<RequireRole roles={['ADMIN','SALES_STAFF']}><CustomerOrders /></RequireRole>} />
+          <Route path="/orders"            element={<RequireRole roles={['ADMIN','WAREHOUSE_STAFF','SALES_STAFF']}><CustomerOrders /></RequireRole>} />
           <Route path="/suppliers"         element={<RequireAdmin><Suppliers /></RequireAdmin>} />
           <Route path="/warehouses"        element={<RequireRole roles={['ADMIN','WAREHOUSE_STAFF']}><Warehouses /></RequireRole>} />
           <Route path="/categories"        element={<RequireAdmin><Categories /></RequireAdmin>} />

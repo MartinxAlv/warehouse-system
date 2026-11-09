@@ -36,7 +36,7 @@ function navLinks(role) {
     links.push({ to: '/warehouses',      label: 'Warehouses',      icon: 'warehouses' })
   }
 
-  if (role === 'ADMIN' || role === 'SALES_STAFF') {
+  if (role === 'ADMIN' || role === 'WAREHOUSE_STAFF' || role === 'SALES_STAFF') {
     links.push({ to: '/orders', label: 'Customer Orders', icon: 'customerOrders' })
   }
 
