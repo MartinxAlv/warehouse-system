@@ -145,6 +145,7 @@ to maximise screen space.
 ### 10. Warehouses
 - Cards per warehouse showing name and address.
 - Expanding a card shows a live inventory breakdown: product, qty, status badge.
+- "Add Warehouse" button *(Admin only)* — Warehouse Staff can view but not create warehouses.
 
 ### 11. Reports
 - KPI summary row (same as Dashboard).
