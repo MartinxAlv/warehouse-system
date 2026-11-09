@@ -22,6 +22,8 @@ export default function Inventory() {
   const [locationTarget, setLocationTarget] = useState(null)
   const [locationValue, setLocationValue] = useState('')
   const [labelTarget, setLabelTarget] = useState(null)
+  const [filterWarehouse, setFilterWarehouse] = useState('')
+  const [filterProduct, setFilterProduct] = useState('')
 
   const products = [...new Map(items.map((i) => [i.product.id, i.product])).values()]
 
@@ -78,16 +80,36 @@ export default function Inventory() {
     setLocationValue(item.binLocation || '')
   }
 
+  const filtered = items.filter((i) => {
+    const matchW = !filterWarehouse || String(i.warehouse?.id) === filterWarehouse
+    const matchP = !filterProduct || String(i.product?.id) === filterProduct
+    return matchW && matchP
+  })
+
   return (
     <div>
       <div className="page-header">
         <div>
           <h1>Inventory</h1>
-          <p className="muted small">{items.length} inventory line{items.length !== 1 ? 's' : ''}</p>
+          <p className="muted small">{filtered.length} of {items.length} inventory line{items.length !== 1 ? 's' : ''}</p>
         </div>
         {canEdit && <button className="btn-secondary" onClick={() => setShowTransfer(true)}>Transfer Stock</button>}
       </div>
       {error && <div className="error-banner">{error}</div>}
+
+      <div className="filter-bar">
+        <select className="filter-select" value={filterWarehouse} onChange={(e) => setFilterWarehouse(e.target.value)}>
+          <option value="">All warehouses</option>
+          {warehouses.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+        </select>
+        <select className="filter-select" value={filterProduct} onChange={(e) => setFilterProduct(e.target.value)}>
+          <option value="">All products</option>
+          {products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+        {(filterWarehouse || filterProduct) && (
+          <button className="link-btn" onClick={() => { setFilterWarehouse(''); setFilterProduct('') }}>Clear</button>
+        )}
+      </div>
 
       <table>
         <thead>
@@ -101,10 +123,10 @@ export default function Inventory() {
           </tr>
         </thead>
         <tbody>
-          {items.length === 0 && (
-            <tr><td colSpan={6} className="empty-state">No inventory yet. Receive a purchase order to add stock.</td></tr>
+          {filtered.length === 0 && (
+            <tr><td colSpan={6} className="empty-state">No inventory matches your filters.</td></tr>
           )}
-          {items.map((i) => {
+          {filtered.map((i) => {
             const low = i.quantityOnHand <= (i.product?.reorderThreshold ?? 0)
             const out = i.quantityOnHand === 0
             return (
