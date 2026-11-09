@@ -10,8 +10,8 @@ A full-stack warehouse inventory management system built with **Spring Boot** (J
 - JWT-based login with secure token storage
 - Three user roles with different permissions:
   - **Admin** — full access including user management, categories, admin tools, and system log
-  - **Warehouse Staff** — inventory operations, purchase orders, stock adjustments
-  - **Sales Staff** — customer orders only
+  - **Warehouse Staff** — inventory operations, purchase orders, stock adjustments, customer order fulfillment
+  - **Sales Staff** — customer orders (create + confirm), read-only inventory and products
 - Demo accounts pre-seeded on first run
 
 ### Inventory Management
@@ -30,7 +30,7 @@ A full-stack warehouse inventory management system built with **Spring Boot** (J
 ### Purchase Orders (Supplier → Warehouse)
 - Create multi-line purchase orders with multiple products
 - Workflow: Draft → Submitted → Received (or Cancelled)
-- Receiving a purchase order automatically adds stock to inventory
+- Receiving a purchase order prompts for a destination warehouse — stock is added to the chosen location
 - Grayed-out action buttons show which steps are available at each stage
 
 ### Customer Orders (Warehouse → Customer)
@@ -363,8 +363,8 @@ The system replaces spreadsheets and manual stock counts with a centralised, rol
 | Role | Typical Person | What They Do |
 |---|---|---|
 | **Admin** | Store / operations manager | Sets up products, categories, suppliers, warehouses; manages staff accounts; views all reports |
-| **Warehouse Staff** | Warehouse operative | Receives shipments, adjusts stock for damage or miscounts, transfers stock, sets bin locations, prints labels |
-| **Sales Staff** | Sales rep / customer service | Creates customer orders, confirms and fulfills them, checks stock availability |
+| **Warehouse Staff** | Warehouse operative | Receives shipments into a chosen warehouse, adjusts stock for damage or miscounts, transfers stock, sets bin locations, prints labels, marks customer orders as fulfilled |
+| **Sales Staff** | Sales rep / customer service | Creates and confirms customer orders, checks stock availability via read-only inventory and products |
 
 ---
 
