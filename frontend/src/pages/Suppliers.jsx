@@ -5,6 +5,23 @@ import { useToast } from '../context/ToastContext.jsx'
 
 const EMPTY = { name: '', contactEmail: '', phone: '', address: '' }
 
+function SupplierForm({ data, setData, onSubmit, submitLabel, onCancel }) {
+  return (
+    <form onSubmit={onSubmit} className="stacked-form">
+      <label>Name<input required value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} /></label>
+      <label>Contact Email<input type="email" value={data.contactEmail} onChange={(e) => setData({ ...data, contactEmail: e.target.value })} /></label>
+      <div className="form-row-2">
+        <label>Phone<input value={data.phone} onChange={(e) => setData({ ...data, phone: e.target.value })} /></label>
+        <label>Address<input value={data.address} onChange={(e) => setData({ ...data, address: e.target.value })} /></label>
+      </div>
+      <div className="form-actions">
+        <button type="button" className="btn-secondary" onClick={onCancel}>Cancel</button>
+        <button type="submit" className="btn-primary">{submitLabel}</button>
+      </div>
+    </form>
+  )
+}
+
 export default function Suppliers() {
   const { toast } = useToast()
   const [suppliers, setSuppliers] = useState([])
@@ -45,23 +62,6 @@ export default function Suppliers() {
     } catch (err) {
       setError(err.message)
     }
-  }
-
-  function SupplierForm({ data, setData, onSubmit, submitLabel, onCancel }) {
-    return (
-      <form onSubmit={onSubmit} className="stacked-form">
-        <label>Name<input required value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} /></label>
-        <label>Contact Email<input type="email" value={data.contactEmail} onChange={(e) => setData({ ...data, contactEmail: e.target.value })} /></label>
-        <div className="form-row-2">
-          <label>Phone<input value={data.phone} onChange={(e) => setData({ ...data, phone: e.target.value })} /></label>
-          <label>Address<input value={data.address} onChange={(e) => setData({ ...data, address: e.target.value })} /></label>
-        </div>
-        <div className="form-actions">
-          <button type="button" className="btn-secondary" onClick={onCancel}>Cancel</button>
-          <button type="submit" className="btn-primary">{submitLabel}</button>
-        </div>
-      </form>
-    )
   }
 
   return (
