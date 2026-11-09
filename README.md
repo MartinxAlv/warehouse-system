@@ -282,6 +282,86 @@ Open **http://localhost:5173** in your browser and sign in with a demo account:
 
 ---
 
+## Option B — Run with Docker
+
+Use this option if you want to run the app without installing Java, Maven, MySQL, or Node on your machine — Docker handles everything. It also works for deploying on a VPS (DigitalOcean, Linode, etc.).
+
+### Prerequisites
+
+- **Docker** — [Install Docker](https://docs.docker.com/get-docker/)
+- **Docker Compose** — included with Docker Desktop on Mac/Windows; on Linux: `sudo apt install docker-compose-plugin`
+
+### Step 1 — Clone the repo
+
+```bash
+git clone https://github.com/MartinxAlv/warehouse-system.git
+cd warehouse-system
+```
+
+### Step 2 — Create your `.env` file
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` and fill in real values:
+
+```env
+DB_USERNAME=stockwell
+DB_PASSWORD=your_strong_db_password
+DB_ROOT_PASSWORD=your_strong_root_password
+JWT_SECRET=a_random_string_at_least_32_characters_long
+CORS_ORIGIN=http://your-server-ip-or-domain
+```
+
+> `CORS_ORIGIN` is the address you'll open in your browser. Use `http://localhost` if running Docker locally, or your server's IP/domain if deploying on a VPS (e.g. `http://165.22.123.45`).
+
+### Step 3 — Build and start
+
+```bash
+docker compose up -d --build
+```
+
+This builds both containers and starts MySQL, the backend, and the frontend. The first build takes a few minutes (Maven downloads dependencies). Subsequent starts are instant.
+
+The app will be live at **http://your-server-ip** (port 80).
+
+### Step 4 — Sign in
+
+Use the same demo accounts:
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@warehouse.com | admin123 |
+| Warehouse Staff | staff@warehouse.com | staff123 |
+| Sales Staff | sales@warehouse.com | sales123 |
+
+### Useful Docker commands
+
+```bash
+# View running containers
+docker compose ps
+
+# Stream logs (all services)
+docker compose logs -f
+
+# Stream logs for one service
+docker compose logs -f backend
+
+# Stop everything
+docker compose down
+
+# Stop and delete the database volume (full reset)
+docker compose down -v
+
+# Rebuild after a code change
+docker compose up -d --build
+```
+
+> **Data persistence:** MySQL data is stored in a Docker volume (`mysql_data`) so it survives container restarts and rebuilds. Only `docker compose down -v` deletes it.
+
+---
+
 ## Sample Data
 
 The system includes a one-click sample dataset that populates a realistic business scenario so you can demo the full workflow immediately.
@@ -443,86 +523,6 @@ All endpoints are under `http://localhost:8080/api/`. Protected endpoints requir
 | POST | `/admin/sample-data/seed` | Admin | Load sample data |
 | DELETE | `/admin/sample-data/clear` | Admin | Clear all data |
 | GET | `/admin/logs` | Admin | View system event log |
-
----
-
-## Option B — Run with Docker
-
-Use this option if you want to run the app without installing Java, Maven, MySQL, or Node on your machine — Docker handles everything. It also works for deploying on a VPS (DigitalOcean, Linode, etc.).
-
-### Prerequisites
-
-- **Docker** — [Install Docker](https://docs.docker.com/get-docker/)
-- **Docker Compose** — included with Docker Desktop on Mac/Windows; on Linux: `sudo apt install docker-compose-plugin`
-
-### Step 1 — Clone the repo
-
-```bash
-git clone https://github.com/MartinxAlv/warehouse-system.git
-cd warehouse-system
-```
-
-### Step 2 — Create your `.env` file
-
-```bash
-cp .env.example .env
-```
-
-Open `.env` and fill in real values:
-
-```env
-DB_USERNAME=stockwell
-DB_PASSWORD=your_strong_db_password
-DB_ROOT_PASSWORD=your_strong_root_password
-JWT_SECRET=a_random_string_at_least_32_characters_long
-CORS_ORIGIN=http://your-server-ip-or-domain
-```
-
-> `CORS_ORIGIN` is the address you'll open in your browser. Use `http://localhost` if running Docker locally, or your server's IP/domain if deploying on a VPS (e.g. `http://165.22.123.45`).
-
-### Step 3 — Build and start
-
-```bash
-docker compose up -d --build
-```
-
-This builds both containers and starts MySQL, the backend, and the frontend. The first build takes a few minutes (Maven downloads dependencies). Subsequent starts are instant.
-
-The app will be live at **http://your-server-ip** (port 80).
-
-### Step 4 — Sign in
-
-Use the same demo accounts:
-
-| Role | Email | Password |
-|---|---|---|
-| Admin | admin@warehouse.com | admin123 |
-| Warehouse Staff | staff@warehouse.com | staff123 |
-| Sales Staff | sales@warehouse.com | sales123 |
-
-### Useful Docker commands
-
-```bash
-# View running containers
-docker compose ps
-
-# Stream logs (all services)
-docker compose logs -f
-
-# Stream logs for one service
-docker compose logs -f backend
-
-# Stop everything
-docker compose down
-
-# Stop and delete the database volume (full reset)
-docker compose down -v
-
-# Rebuild after a code change
-docker compose up -d --build
-```
-
-> **Data persistence:** MySQL data is stored in a Docker volume (`mysql_data`) so it survives container restarts and rebuilds. Only `docker compose down -v` deletes it.
 
 ---
 
