@@ -41,7 +41,7 @@ export default function Dashboard() {
       .then(([s, ls, mv]) => {
         setSummary(s)
         setLowStock(ls)
-        setMovements(mv.slice(0, 8))
+        setMovements([...mv].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 8))
       })
       .catch((e) => setError(e.message))
   }, [])
