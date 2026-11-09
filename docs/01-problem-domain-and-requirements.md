@@ -36,8 +36,8 @@ the Java layer is responsible for enforcing.
 | Actor | Description |
 |---|---|
 | **Admin** | Full access: manages users, products, categories, suppliers, warehouses, views all reports |
-| **Warehouse Staff** | Receives purchase orders, records stock adjustments, transfers stock between warehouses |
-| **Sales Staff** | Creates and manages customer orders, views product availability |
+| **Warehouse Staff** | Receives purchase orders into a chosen warehouse, records stock adjustments, transfers stock between warehouses, fulfils customer orders |
+| **Sales Staff** | Creates and confirms customer orders, views product availability and inventory levels |
 | **Customer** *(optional/stretch)* | Browses products and places orders through a storefront view |
 
 ## 3. Functional Requirements
@@ -74,7 +74,7 @@ the Java layer is responsible for enforcing.
 - FR19: Receiving a purchase order (in full or in part) shall automatically increase inventory and create a corresponding stock movement record.
 
 ### 3.6 Customer Orders (eCommerce sales side)
-- FR20: The system shall allow Sales Staff to create a customer order containing one or more line items.
+- FR20: The system shall allow Sales Staff to create and confirm customer orders; Warehouse Staff shall be able to mark orders as fulfilled once shipped.
 - FR21: The system shall check available inventory before confirming an order and reject/flag items that are out of stock.
 - FR22: Confirming/fulfilling an order shall automatically decrease inventory and create a corresponding stock movement record.
 - FR23: The system shall support order statuses: PENDING → CONFIRMED → FULFILLED → CANCELLED.

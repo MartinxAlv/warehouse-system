@@ -13,7 +13,7 @@
 │  > Stock Log    †  │                                      │
 │  > Purchase Orders │  † Warehouse Staff + Admin only      │
 │  > Warehouses   †  │                                      │
-│  > Customer Orders ‡  ‡ Sales Staff + Admin only          │
+│  > Customer Orders ‡  ‡ Warehouse Staff + Sales Staff + Admin│
 │  > Reports         │                                      │
 │  > Suppliers    *  │  * Admin only                        │
 │  > Categories   *  │                                      │
@@ -34,7 +34,7 @@
 | Stock Log        | ✓     | ✓               | —           |
 | Purchase Orders  | ✓     | ✓               | —           |
 | Warehouses       | ✓     | ✓               | —           |
-| Customer Orders  | ✓     | —               | ✓           |
+| Customer Orders  | ✓     | ✓               | ✓           |
 | Reports          | ✓     | ✓               | ✓           |
 | Suppliers        | ✓     | —               | —           |
 | Categories       | ✓     | —               | —           |
@@ -79,12 +79,14 @@ to maximise screen space.
   Column headers for SKU, Name, Category, and Price are clickable to sort
   ascending/descending.
 - Search bar filters by name or SKU inline; category dropdown filters by category.
+- **Read-only badge** shown next to the page title for Warehouse Staff and Sales Staff —
+  makes it immediately clear that editing is not available for their role.
 - **Show inactive** toggle button *(Admin only)* — when on, fetches all products
   including deactivated ones. Inactive rows appear dimmed with a grey "Inactive" badge.
   Active products show Edit + Deactivate buttons; inactive products show a Reactivate
-  button instead.
-- "Add Product" opens a modal: name, SKU, category dropdown, price, description,
-  reorder threshold.
+  button instead. These action buttons are hidden entirely for non-Admin roles.
+- "Add Product" opens a modal *(Admin only)*: name, SKU, category dropdown, price,
+  description, reorder threshold.
 - Deactivated products are soft-deleted (the `active` flag is set to false, the row is
   kept in the database) so historical order and stock data is always preserved.
 
@@ -100,6 +102,8 @@ to maximise screen space.
   map-pin icon; clicking it opens an inline edit modal to update the text. Unset
   locations show "Set location" in muted text. Sales Staff see the bin address as
   read-only text with no edit affordance.
+- **Read-only badge** shown next to the page title for Sales Staff — makes it clear
+  that stock actions are not available for their role.
 - **Actions per row**: "Adjust" *(Admin + Warehouse Staff only)* opens the stock
   adjustment modal. Printer icon opens the **QR Product Label** modal (all roles).
 - **Transfer Stock** button in page header *(Admin + Warehouse Staff only)* opens a
@@ -126,6 +130,9 @@ to maximise screen space.
   cost), submit.
 - Expand a row to see line items and status action buttons. Buttons are disabled/
   greyed out when not applicable to the current status.
+- **Receive modal**: clicking Receive opens a confirmation modal showing all line items
+  and quantities being received, plus a warehouse dropdown to choose which warehouse
+  the stock is received into. This prevents stock silently landing in the wrong location.
 
 ### 8. Customer Orders
 - List view with status badges (Pending / Confirmed / Fulfilled / Cancelled).
