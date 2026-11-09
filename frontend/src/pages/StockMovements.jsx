@@ -32,24 +32,35 @@ export default function StockMovements() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('')
+  const [filterProduct, setFilterProduct] = useState('')
+  const [filterWarehouse, setFilterWarehouse] = useState('')
 
   useEffect(() => {
     api.getMovements()
-      .then(setMovements)
+      .then((mv) => setMovements([...mv].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
   }, [])
 
+  const products = [...new Map(movements.map((m) => [m.product?.id, m.product])).values()].filter(Boolean)
+  const warehouses = [...new Map(movements.map((m) => [m.warehouse?.id, m.warehouse])).values()].filter(Boolean)
+
   const filtered = movements.filter((m) => {
-    if (!filter) return true
-    const q = filter.toLowerCase()
-    return (
-      m.product?.name?.toLowerCase().includes(q) ||
-      m.warehouse?.name?.toLowerCase().includes(q) ||
-      m.type?.toLowerCase().includes(q) ||
-      m.reason?.toLowerCase().includes(q)
-    )
+    if (filterProduct && String(m.product?.id) !== filterProduct) return false
+    if (filterWarehouse && String(m.warehouse?.id) !== filterWarehouse) return false
+    if (filter) {
+      const q = filter.toLowerCase()
+      return (
+        m.product?.name?.toLowerCase().includes(q) ||
+        m.warehouse?.name?.toLowerCase().includes(q) ||
+        m.type?.toLowerCase().includes(q) ||
+        m.reason?.toLowerCase().includes(q)
+      )
+    }
+    return true
   })
+
+  const hasFilter = filter || filterProduct || filterWarehouse
 
   if (loading) return (
     <div className="loading">
@@ -78,7 +89,15 @@ export default function StockMovements() {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
-        {filter && <button className="link-btn" onClick={() => setFilter('')}>Clear</button>}
+        <select className="filter-select" value={filterProduct} onChange={(e) => setFilterProduct(e.target.value)}>
+          <option value="">All products</option>
+          {products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+        <select className="filter-select" value={filterWarehouse} onChange={(e) => setFilterWarehouse(e.target.value)}>
+          <option value="">All warehouses</option>
+          {warehouses.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+        </select>
+        {hasFilter && <button className="link-btn" onClick={() => { setFilter(''); setFilterProduct(''); setFilterWarehouse('') }}>Clear</button>}
         <span className="muted small" style={{ marginLeft: 'auto' }}>{filtered.length} record{filtered.length !== 1 ? 's' : ''}</span>
       </div>
 

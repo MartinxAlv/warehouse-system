@@ -35,6 +35,7 @@ export default function Dashboard() {
   const [lowStock, setLowStock] = useState([])
   const [movements, setMovements] = useState([])
   const [error, setError] = useState('')
+  const [filterLowStockWarehouse, setFilterLowStockWarehouse] = useState('')
 
   useEffect(() => {
     Promise.all([api.getDashboardSummary(), api.getLowStock(), api.getMovements()])
@@ -88,7 +89,22 @@ export default function Dashboard() {
 
       <div className="two-col">
         <section className="panel">
-          <h2>Low Stock Alerts</h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <h2 style={{ margin: 0 }}>Low Stock Alerts</h2>
+            {lowStock.length > 0 && (
+              <select
+                className="filter-select"
+                style={{ fontSize: '0.8rem', padding: '4px 8px' }}
+                value={filterLowStockWarehouse}
+                onChange={(e) => setFilterLowStockWarehouse(e.target.value)}
+              >
+                <option value="">All warehouses</option>
+                {[...new Map(lowStock.map(i => [i.warehouse.id, i.warehouse])).values()].map(w => (
+                  <option key={w.id} value={w.id}>{w.name}</option>
+                ))}
+              </select>
+            )}
+          </div>
           {lowStock.length === 0 ? (
             <div className="empty-state">All products are well stocked.</div>
           ) : (
@@ -97,7 +113,7 @@ export default function Dashboard() {
                 <tr><th>Product</th><th>Warehouse</th><th>On Hand</th><th>Threshold</th></tr>
               </thead>
               <tbody>
-                {lowStock.map((i) => (
+                {lowStock.filter(i => !filterLowStockWarehouse || String(i.warehouse.id) === filterLowStockWarehouse).map((i) => (
                   <tr key={i.id}>
                     <td style={{ fontWeight: 500, color: 'var(--text)' }}>{i.product.name}</td>
                     <td>{i.warehouse.name}</td>

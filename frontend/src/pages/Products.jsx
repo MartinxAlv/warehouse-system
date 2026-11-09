@@ -52,6 +52,19 @@ export default function Products() {
   const [confirmTarget, setConfirmTarget] = useState(null)
   const [form, setForm] = useState(EMPTY)
   const [editForm, setEditForm] = useState(EMPTY)
+  const [sort, setSort] = useState({ col: 'name', dir: 'asc' })
+
+  function toggleSort(col) {
+    setSort(s => s.col === col ? { col, dir: s.dir === 'asc' ? 'desc' : 'asc' } : { col, dir: 'asc' })
+  }
+  function SortTh({ col, children }) {
+    const active = sort.col === col
+    return (
+      <th onClick={() => toggleSort(col)} style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}>
+        {children} {active ? (sort.dir === 'asc' ? '↑' : '↓') : <span style={{ opacity: 0.3 }}>↕</span>}
+      </th>
+    )
+  }
 
   function load() {
     const fetchProducts = isAdmin && showInactive ? api.getAllProducts() : api.getProducts()
@@ -121,11 +134,23 @@ export default function Products() {
     }
   }
 
+  const sortVal = (p) => {
+    if (sort.col === 'sku') return p.sku?.toLowerCase()
+    if (sort.col === 'price') return Number(p.price)
+    if (sort.col === 'category') return p.category?.name?.toLowerCase()
+    return p.name?.toLowerCase()
+  }
+
   const filtered = products.filter((p) => {
     const q = search.toLowerCase()
     const matchSearch = !q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)
     const matchCat = !filterCategory || String(p.category?.id) === filterCategory
     return matchSearch && matchCat
+  }).sort((a, b) => {
+    const av = sortVal(a), bv = sortVal(b)
+    if (av < bv) return sort.dir === 'asc' ? -1 : 1
+    if (av > bv) return sort.dir === 'asc' ? 1 : -1
+    return 0
   })
 
   return (
@@ -172,7 +197,7 @@ export default function Products() {
 
       <table>
         <thead>
-          <tr><th>SKU</th><th>Name</th><th>Category</th><th>Price</th><th>Reorder At</th><th>Status</th><th></th></tr>
+          <tr><SortTh col="sku">SKU</SortTh><SortTh col="name">Name</SortTh><SortTh col="category">Category</SortTh><SortTh col="price">Price</SortTh><th>Reorder At</th><th>Status</th><th></th></tr>
         </thead>
         <tbody>
           {filtered.length === 0 && (

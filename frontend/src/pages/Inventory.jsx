@@ -24,6 +24,19 @@ export default function Inventory() {
   const [labelTarget, setLabelTarget] = useState(null)
   const [filterWarehouse, setFilterWarehouse] = useState('')
   const [filterProduct, setFilterProduct] = useState('')
+  const [sort, setSort] = useState({ col: 'product', dir: 'asc' })
+
+  function toggleSort(col) {
+    setSort(s => s.col === col ? { col, dir: s.dir === 'asc' ? 'desc' : 'asc' } : { col, dir: 'asc' })
+  }
+  function SortTh({ col, children }) {
+    const active = sort.col === col
+    return (
+      <th onClick={() => toggleSort(col)} style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}>
+        {children} {active ? (sort.dir === 'asc' ? '↑' : '↓') : <span style={{ opacity: 0.3 }}>↕</span>}
+      </th>
+    )
+  }
 
   const products = [...new Map(items.map((i) => [i.product.id, i.product])).values()]
 
@@ -84,6 +97,15 @@ export default function Inventory() {
     const matchW = !filterWarehouse || String(i.warehouse?.id) === filterWarehouse
     const matchP = !filterProduct || String(i.product?.id) === filterProduct
     return matchW && matchP
+  }).sort((a, b) => {
+    let av, bv
+    if (sort.col === 'warehouse') { av = a.warehouse?.name?.toLowerCase(); bv = b.warehouse?.name?.toLowerCase() }
+    else if (sort.col === 'qty') { av = a.quantityOnHand; bv = b.quantityOnHand }
+    else if (sort.col === 'sku') { av = a.product?.sku?.toLowerCase(); bv = b.product?.sku?.toLowerCase() }
+    else { av = a.product?.name?.toLowerCase(); bv = b.product?.name?.toLowerCase() }
+    if (av < bv) return sort.dir === 'asc' ? -1 : 1
+    if (av > bv) return sort.dir === 'asc' ? 1 : -1
+    return 0
   })
 
   return (
@@ -91,7 +113,19 @@ export default function Inventory() {
       <div className="page-header">
         <div>
           <h1>Inventory</h1>
-          <p className="muted small">{filtered.length} of {items.length} inventory line{items.length !== 1 ? 's' : ''}</p>
+          <p className="muted small" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {filtered.length} of {items.length} inventory line{items.length !== 1 ? 's' : ''}
+            {items.filter(i => i.quantityOnHand > 0 && i.quantityOnHand <= (i.product?.reorderThreshold ?? 0)).length > 0 && (
+              <span className="badge badge-amber">
+                {items.filter(i => i.quantityOnHand > 0 && i.quantityOnHand <= (i.product?.reorderThreshold ?? 0)).length} low stock
+              </span>
+            )}
+            {items.filter(i => i.quantityOnHand === 0).length > 0 && (
+              <span className="badge badge-red">
+                {items.filter(i => i.quantityOnHand === 0).length} out of stock
+              </span>
+            )}
+          </p>
         </div>
         {canEdit && <button className="btn-secondary" onClick={() => setShowTransfer(true)}>Transfer Stock</button>}
       </div>
@@ -114,17 +148,18 @@ export default function Inventory() {
       <table>
         <thead>
           <tr>
-            <th>Product</th>
-            <th>Warehouse</th>
+            <SortTh col="product">Product</SortTh>
+            <SortTh col="sku">SKU</SortTh>
+            <SortTh col="warehouse">Warehouse</SortTh>
             <th>Bin Location</th>
-            <th>Qty on Hand</th>
+            <SortTh col="qty">Qty on Hand</SortTh>
             <th>Status</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {filtered.length === 0 && (
-            <tr><td colSpan={6} className="empty-state">No inventory matches your filters.</td></tr>
+            <tr><td colSpan={7} className="empty-state">No inventory matches your filters.</td></tr>
           )}
           {filtered.map((i) => {
             const low = i.quantityOnHand <= (i.product?.reorderThreshold ?? 0)
@@ -132,6 +167,7 @@ export default function Inventory() {
             return (
               <tr key={i.id}>
                 <td style={{ fontWeight: 500, color: 'var(--text)' }}>{i.product?.name}</td>
+                <td><code className="sku-code">{i.product?.sku}</code></td>
                 <td>{i.warehouse?.name}</td>
                 <td>
                   {canEdit ? (
