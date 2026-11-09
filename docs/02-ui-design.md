@@ -53,11 +53,15 @@ to maximise screen space.
   and time of day.
 - **KPI cards** across the top: Total Inventory Lines, Total Units in Stock, Low Stock
   Items, Total Customer Orders.
-- **Low Stock Alert table**: product, current qty, reorder threshold, warehouse.
-- **Recent Activity feed**: latest stock movements (type, product, qty, timestamp).
+- **Low Stock Alert table**: product, current qty, reorder threshold, warehouse. A
+  warehouse dropdown filter lets you narrow the table to a single warehouse.
+- **Recent Activity feed**: latest 8 stock movements sorted newest first (type, product,
+  qty, timestamp).
 
 ### 3. Products
 - Table: SKU, Name, Category, Price, Reorder At, Status (Active/Inactive), actions.
+  Column headers for SKU, Name, Category, and Price are clickable to sort
+  ascending/descending.
 - Search bar filters by name or SKU inline; category dropdown filters by category.
 - **Show inactive** toggle button *(Admin only)* — when on, fetches all products
   including deactivated ones. Inactive rows appear dimmed with a grey "Inactive" badge.
@@ -69,8 +73,13 @@ to maximise screen space.
   kept in the database) so historical order and stock data is always preserved.
 
 ### 4. Inventory
-- Table: Product, Warehouse, **Bin Location**, Quantity on Hand, Status (OK/Low/Out),
-  Actions.
+- Table: Product, **SKU**, Warehouse, **Bin Location**, Quantity on Hand, Status
+  (OK/Low/Out), Actions. Column headers for Product, SKU, Warehouse, and Qty on Hand
+  are clickable to sort ascending/descending.
+- **Filter bar**: warehouse dropdown and product dropdown let you narrow the table
+  instantly. A Clear button appears when any filter is active.
+- **Stock badges** next to the page title show a live count of low stock and out of
+  stock lines (e.g. "3 low stock · 1 out of stock").
 - **Bin Location cell** *(Admin + Warehouse Staff only)*: shows the bin address with a
   map-pin icon; clicking it opens an inline edit modal to update the text. Unset
   locations show "Set location" in muted text. Sales Staff see the bin address as
@@ -78,7 +87,8 @@ to maximise screen space.
 - **Actions per row**: "Adjust" *(Admin + Warehouse Staff only)* opens the stock
   adjustment modal. Printer icon opens the **QR Product Label** modal (all roles).
 - **Transfer Stock** button in page header *(Admin + Warehouse Staff only)* opens a
-  modal: product, from-warehouse, to-warehouse, quantity.
+  modal: product, from-warehouse, to-warehouse, quantity. After selecting a product,
+  a compact summary shows current stock levels per warehouse inline.
 
 ### 5. QR Product Label (modal, printable)
 - Opens from the printer icon on any Inventory row.
@@ -88,8 +98,10 @@ to maximise screen space.
   everything except the label card so it prints cleanly at sticker size.
 
 ### 6. Stock Movement Log
-- Full audit table: Movement Type, Product, Warehouse, Qty Change, Reason, Reference
-  (order ID), Timestamp.
+- Full audit table: Date & Time, Product, Warehouse, Movement Type, Qty Change, Reason,
+  Reference (order ID). Sorted newest first.
+- **Filter bar**: text search (product, warehouse, type, reason) plus product and
+  warehouse dropdown filters. All three filters combine — a Clear button resets them.
 - Read-only — no actions. Every stock change in the system appears here.
 
 ### 7. Purchase Orders
