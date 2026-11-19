@@ -10,6 +10,31 @@ function fmtDate(d) {
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
+// Suggest a split for each line item: fill from the warehouse with the most stock first,
+// so the order ships from as few warehouses as possible.
+function autoAllocate(order, warehouses, inventory) {
+  const plan = {}
+  for (const item of order.items ?? []) {
+    const pid = item.product.id
+    let remaining = item.quantity
+    const stock = warehouses
+      .map((w) => ({ wid: w.id, onHand: onHandFor(inventory, pid, w.id) }))
+      .sort((a, b) => b.onHand - a.onHand)
+    plan[pid] = {}
+    for (const { wid, onHand } of stock) {
+      const take = Math.min(remaining, onHand)
+      plan[pid][wid] = take > 0 ? String(take) : ''
+      remaining -= Math.max(take, 0)
+    }
+  }
+  return plan
+}
+
+function onHandFor(inventory, productId, warehouseId) {
+  const row = inventory.find((i) => i.product?.id === productId && i.warehouse?.id === warehouseId)
+  return row ? row.quantityOnHand : 0
+}
+
 const EMPTY_ITEM = { productId: '', quantity: '' }
 const EMPTY_HEADER = { customerName: '', customerEmail: '' }
 
@@ -22,6 +47,10 @@ export default function CustomerOrders() {
   const [showForm, setShowForm] = useState(false)
   const [detailOrder, setDetailOrder] = useState(null)
   const [cancelTarget, setCancelTarget] = useState(null)
+  const [fulfillTarget, setFulfillTarget] = useState(null)
+  const [inventory, setInventory] = useState([])
+  const [plan, setPlan] = useState({})
+  const [fulfilling, setFulfilling] = useState(false)
   const [header, setHeader] = useState(EMPTY_HEADER)
   const [items, setItems] = useState([{ ...EMPTY_ITEM }])
 
@@ -57,16 +86,54 @@ export default function CustomerOrders() {
     catch (err) { setError(err.message) }
   }
 
-  async function fulfill(id) {
-    const warehouseId = warehouses[0]?.id
-    if (!warehouseId) return setError('Create a warehouse first')
-    try { await api.fulfillOrder(id, { warehouseId }); toast('Order fulfilled'); load() }
-    catch (err) { setError(err.message) }
+  async function openFulfill(order) {
+    if (warehouses.length === 0) return setError('Create a warehouse first')
+    try {
+      const inv = await api.getInventory()
+      setInventory(inv)
+      setPlan(autoAllocate(order, warehouses, inv))
+      setFulfillTarget(order)
+    } catch (err) { setError(err.message) }
+  }
+
+  function closeFulfill() { setFulfillTarget(null); setPlan({}) }
+
+  function setTake(productId, warehouseId, val) {
+    setPlan({ ...plan, [productId]: { ...plan[productId], [warehouseId]: val } })
+  }
+
+  function allocatedFor(productId) {
+    return Object.values(plan[productId] ?? {}).reduce((sum, v) => sum + (Number(v) || 0), 0)
+  }
+
+  const fulfillReady = fulfillTarget && (fulfillTarget.items ?? []).every((item) => {
+    const pid = item.product.id
+    if (allocatedFor(pid) !== item.quantity) return false
+    return warehouses.every((w) => (Number(plan[pid]?.[w.id]) || 0) <= onHandFor(inventory, pid, w.id))
+  })
+
+  async function submitFulfill(e) {
+    e.preventDefault()
+    const allocations = []
+    for (const [productId, byWarehouse] of Object.entries(plan)) {
+      for (const [warehouseId, qty] of Object.entries(byWarehouse)) {
+        if (Number(qty) > 0) allocations.push({ productId: Number(productId), warehouseId: Number(warehouseId), quantity: Number(qty) })
+      }
+    }
+    setFulfilling(true)
+    try {
+      await api.fulfillOrder(fulfillTarget.id, { allocations })
+      const used = new Set(allocations.map((a) => a.warehouseId)).size
+      toast(`Order fulfilled from ${used} warehouse${used !== 1 ? 's' : ''}`)
+      closeFulfill()
+      load()
+    } catch (err) { setError(err.message) }
+    finally { setFulfilling(false) }
   }
 
   async function doCancel(id) {
-    const warehouseId = warehouses[0]?.id
-    try { await api.cancelOrder(id, { warehouseId }); toast('Order cancelled', 'info'); load() }
+    // Stock from a fulfilled order goes back to the warehouses it was pulled from (handled server-side)
+    try { await api.cancelOrder(id); toast('Order cancelled', 'info'); load() }
     catch (err) { setError(err.message) }
   }
 
@@ -110,8 +177,8 @@ export default function CustomerOrders() {
                   <button
                     className="link-btn"
                     disabled={o.status !== 'CONFIRMED'}
-                    title={o.status !== 'CONFIRMED' ? 'Order must be Confirmed to fulfill' : 'Mark as fulfilled and deduct stock'}
-                    onClick={() => fulfill(o.id)}
+                    title={o.status !== 'CONFIRMED' ? 'Order must be Confirmed to fulfill' : 'Choose warehouses to pull stock from'}
+                    onClick={() => openFulfill(o)}
                   >Fulfill</button>
                   <button
                     className="link-btn danger"
@@ -197,10 +264,83 @@ export default function CustomerOrders() {
             </table>
             <div className="detail-footer">
               <button className="link-btn" disabled={detailOrder.status !== 'PENDING'} onClick={() => { confirmOrder(detailOrder.id); setDetailOrder(null) }}>Confirm</button>
-              <button className="link-btn" disabled={detailOrder.status !== 'CONFIRMED'} onClick={() => { fulfill(detailOrder.id); setDetailOrder(null) }}>Fulfill</button>
+              <button className="link-btn" disabled={detailOrder.status !== 'CONFIRMED'} onClick={() => { setDetailOrder(null); openFulfill(detailOrder) }}>Fulfill</button>
               <button className="btn-danger" disabled={detailOrder.status === 'CANCELLED' || detailOrder.status === 'FULFILLED'} onClick={() => { setDetailOrder(null); setCancelTarget(detailOrder) }}>Cancel Order</button>
             </div>
           </div>
+        </Modal>
+      )}
+
+      {fulfillTarget && (
+        <Modal title={`Fulfill Order #${fulfillTarget.id}`} onClose={closeFulfill}>
+          <form onSubmit={submitFulfill} className="stacked-form">
+            <div className="fulfill-intro">
+              <p className="muted small">
+                Choose how many units to pull from each warehouse. We've suggested a split that uses the
+                fewest warehouses — edit any number to change it.
+              </p>
+              <button type="button" className="link-btn" onClick={() => setPlan(autoAllocate(fulfillTarget, warehouses, inventory))}>
+                Reset suggestion
+              </button>
+            </div>
+
+            {(fulfillTarget.items ?? []).map((item) => {
+              const pid = item.product.id
+              const allocated = allocatedFor(pid)
+              const status = allocated === item.quantity ? 'ok' : allocated > item.quantity ? 'over' : 'under'
+              return (
+                <div key={item.id} className="fulfill-item">
+                  <div className="fulfill-item-head">
+                    <strong>{item.product.name}</strong>
+                    <span className={`alloc-pill alloc-${status}`}>{allocated} / {item.quantity} allocated</span>
+                  </div>
+                  <table className="inner-table">
+                    <thead><tr><th>Warehouse</th><th>On Hand</th><th>Take</th></tr></thead>
+                    <tbody>
+                      {warehouses.map((w) => {
+                        const onHand = onHandFor(inventory, pid, w.id)
+                        const take = plan[pid]?.[w.id] ?? ''
+                        const tooMany = (Number(take) || 0) > onHand
+                        return (
+                          <tr key={w.id}>
+                            <td>{w.name}</td>
+                            <td className={onHand === 0 ? 'muted' : ''}>{onHand}</td>
+                            <td>
+                              <input
+                                type="number"
+                                min="0"
+                                max={onHand}
+                                className={`take-input${tooMany ? ' invalid' : ''}`}
+                                disabled={onHand === 0}
+                                value={take}
+                                placeholder="0"
+                                title={tooMany ? `Only ${onHand} on hand` : undefined}
+                                onChange={(e) => setTake(pid, w.id, e.target.value)}
+                              />
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                  {status === 'under' && allocated < item.quantity && (
+                    <p className="small alloc-hint">
+                      {item.quantity - allocated} more needed
+                      {warehouses.reduce((s, w) => s + onHandFor(inventory, pid, w.id), 0) < item.quantity && ' — not enough stock across all warehouses'}
+                    </p>
+                  )}
+                  {status === 'over' && <p className="small alloc-hint">{allocated - item.quantity} too many allocated</p>}
+                </div>
+              )
+            })}
+
+            <div className="form-actions">
+              <button type="button" className="btn-secondary" onClick={closeFulfill}>Cancel</button>
+              <button type="submit" className="btn-primary" disabled={!fulfillReady || fulfilling}>
+                {fulfilling ? 'Fulfilling…' : 'Fulfill Order'}
+              </button>
+            </div>
+          </form>
         </Modal>
       )}
 

@@ -1857,3 +1857,47 @@ tbody tr:hover { background: #eef2ff; }
   border-right: 1px solid rgba(255,255,255,0.08);
   box-shadow: 2px 0 16px rgba(0,0,0,0.5);
 }
+
+/* ── Fulfill order: per-warehouse allocation ─────────────────────────────── */
+.fulfill-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.fulfill-intro .link-btn { white-space: nowrap; }
+
+.fulfill-item { display: flex; flex-direction: column; gap: 8px; }
+
+.fulfill-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+}
+
+.alloc-pill {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.alloc-ok    { background: var(--green-bg); color: var(--green-text); }
+.alloc-under { background: var(--amber-bg); color: var(--amber-text); }
+.alloc-over  { background: var(--red-bg);   color: var(--red-text); }
+
+.alloc-hint { color: var(--amber-text); margin: 0; }
+
+.take-input {
+  width: 84px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+}
+.take-input:disabled { opacity: 0.45; }
+.take-input.invalid { border-color: var(--red); }

@@ -21,7 +21,6 @@ public class SampleDataService {
     private final PurchaseOrderService purchaseOrderService;
     private final CustomerOrderService customerOrderService;
     private final InventoryService inventoryService;
-    private final AppLogService appLogService;
     private final JdbcTemplate jdbc;
 
     public SampleDataService(CategoryRepository categoryRepository,
@@ -31,7 +30,6 @@ public class SampleDataService {
                               PurchaseOrderService purchaseOrderService,
                               CustomerOrderService customerOrderService,
                               InventoryService inventoryService,
-                              AppLogService appLogService,
                               JdbcTemplate jdbc) {
         this.categoryRepository = categoryRepository;
         this.supplierRepository = supplierRepository;
@@ -40,7 +38,6 @@ public class SampleDataService {
         this.purchaseOrderService = purchaseOrderService;
         this.customerOrderService = customerOrderService;
         this.inventoryService = inventoryService;
-        this.appLogService = appLogService;
         this.jdbc = jdbc;
     }
 

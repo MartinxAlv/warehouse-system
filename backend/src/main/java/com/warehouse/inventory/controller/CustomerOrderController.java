@@ -4,6 +4,7 @@ import com.warehouse.inventory.model.CustomerOrder;
 import com.warehouse.inventory.service.CustomerOrderService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +45,29 @@ public class CustomerOrderController {
         return customerOrderService.confirmOrder(id);
     }
 
+    /**
+     * Body is either:
+     *   { "allocations": [ { "productId": 1, "warehouseId": 2, "quantity": 5 }, ... ] }  (split across warehouses)
+     *   { "warehouseId": 2 }                                                            (everything from one warehouse)
+     */
+    @SuppressWarnings("unchecked")
     @PostMapping("/{id}/fulfill")
     public CustomerOrder fulfill(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        Object rawAllocations = body.get("allocations");
+        if (rawAllocations instanceof List<?> list) {
+            List<CustomerOrderService.Allocation> allocations = new ArrayList<>();
+            for (Object o : list) {
+                Map<String, Object> a = (Map<String, Object>) o;
+                allocations.add(new CustomerOrderService.Allocation(
+                        ((Number) a.get("productId")).longValue(),
+                        ((Number) a.get("warehouseId")).longValue(),
+                        ((Number) a.get("quantity")).intValue()));
+            }
+            return customerOrderService.fulfillOrder(id, allocations);
+        }
+        if (body.get("warehouseId") == null) {
+            throw new IllegalArgumentException("Provide either allocations or warehouseId");
+        }
         Long warehouseId = ((Number) body.get("warehouseId")).longValue();
         return customerOrderService.fulfillOrder(id, warehouseId);
     }
