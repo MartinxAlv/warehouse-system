@@ -155,7 +155,7 @@ export default function CustomerOrders() {
         <tbody>
           {orders.length === 0 && <tr><td colSpan={6} className="empty-state">No orders yet.</td></tr>}
           {orders.map((o) => {
-            const done = o.status === 'FULFILLED' || o.status === 'CANCELLED'
+            const cancelled = o.status === 'CANCELLED'
             return (
               <tr key={o.id}>
                 <td><span className="order-id">#{o.id}</span></td>
@@ -182,8 +182,10 @@ export default function CustomerOrders() {
                   >Fulfill</button>
                   <button
                     className="link-btn danger"
-                    disabled={done}
-                    title={done ? 'Order is already completed or cancelled' : 'Cancel this order'}
+                    disabled={cancelled}
+                    title={cancelled ? 'Order is already cancelled'
+                      : o.status === 'FULFILLED' ? 'Cancel and return stock to the warehouses it came from'
+                      : 'Cancel this order'}
                     onClick={() => setCancelTarget(o)}
                   >Cancel</button>
                 </td>
@@ -265,7 +267,7 @@ export default function CustomerOrders() {
             <div className="detail-footer">
               <button className="link-btn" disabled={detailOrder.status !== 'PENDING'} onClick={() => { confirmOrder(detailOrder.id); setDetailOrder(null) }}>Confirm</button>
               <button className="link-btn" disabled={detailOrder.status !== 'CONFIRMED'} onClick={() => { setDetailOrder(null); openFulfill(detailOrder) }}>Fulfill</button>
-              <button className="btn-danger" disabled={detailOrder.status === 'CANCELLED' || detailOrder.status === 'FULFILLED'} onClick={() => { setDetailOrder(null); setCancelTarget(detailOrder) }}>Cancel Order</button>
+              <button className="btn-danger" disabled={detailOrder.status === 'CANCELLED'} onClick={() => { setDetailOrder(null); setCancelTarget(detailOrder) }}>Cancel Order</button>
             </div>
           </div>
         </Modal>
@@ -347,7 +349,9 @@ export default function CustomerOrders() {
       {cancelTarget && (
         <ConfirmModal
           title="Cancel Order"
-          message={`Cancel order #${cancelTarget.id} for ${cancelTarget.customerName}? This action cannot be undone.`}
+          message={cancelTarget.status === 'FULFILLED'
+            ? `Cancel fulfilled order #${cancelTarget.id} for ${cancelTarget.customerName}? Its stock will be returned to the warehouses it was pulled from. This action cannot be undone.`
+            : `Cancel order #${cancelTarget.id} for ${cancelTarget.customerName}? This action cannot be undone.`}
           confirmLabel="Cancel Order"
           danger
           onConfirm={() => doCancel(cancelTarget.id)}
