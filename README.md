@@ -36,7 +36,8 @@ A full-stack warehouse inventory management system built with **Spring Boot** (J
 ### Customer Orders (Warehouse → Customer)
 - Create orders with multiple line items
 - Workflow: Pending → Confirmed → Fulfilled (or Cancelled)
-- Fulfilling an order automatically deducts stock from inventory
+- Fulfilling an order opens a modal to choose which warehouse(s) to pull stock from — an order can be split across multiple warehouses, with a suggested split pre-filled
+- Cancelling a fulfilled order returns stock to the warehouses it came from
 - Date, customer info, and line item breakdown on every order
 
 ### Products & Categories
@@ -459,7 +460,7 @@ Creates warehouses, categories, suppliers, products, and staff accounts.
 Creates a purchase order, submits it, then receives the delivery — stock is added automatically. Bin locations are set for each item so pickers know exactly where to find them.
 
 #### Step 3 — Sales Staff fulfills a customer order
-Creates an order, confirms it with the customer, and fulfills it — stock is deducted automatically.
+Creates an order, confirms it with the customer, and fulfills it. If no single warehouse has enough stock, the order is split across warehouses (e.g. 175 units from Chicago + 2 from New York) — stock is deducted from each automatically.
 
 #### Step 4 — Warehouse Staff handles a discrepancy
 During a stocktake, finds 3 damaged cables. Uses Inventory → Adjust → `-3` → reason: Damaged. The log records the change permanently.
@@ -514,7 +515,8 @@ All endpoints are under `http://localhost:8080/api/`. Protected endpoints requir
 | GET | `/orders` | All | List customer orders |
 | POST | `/orders` | All | Create customer order |
 | POST | `/orders/{id}/confirm` | All | Confirm order |
-| POST | `/orders/{id}/fulfill` | All | Fulfill order and deduct stock |
+| POST | `/orders/{id}/fulfill` | All | Fulfill order from one or more warehouses (`allocations`: productId, warehouseId, quantity) |
+| POST | `/orders/{id}/cancel` | All | Cancel order (returns stock if already fulfilled) |
 | GET | `/users` | Admin | List users |
 | POST | `/users` | Admin | Create user |
 | PUT | `/users/{id}` | Admin | Update user |

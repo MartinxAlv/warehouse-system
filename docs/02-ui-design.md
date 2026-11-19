@@ -138,6 +138,10 @@ to maximise screen space.
 - List view with status badges (Pending / Confirmed / Fulfilled / Cancelled).
 - "New Order" modal: customer name + email, add line items (product + qty).
 - Expand a row to see line items, totals, and status action buttons.
+- **Fulfill modal**: clicking Fulfill shows each line item with every warehouse's on-hand
+  stock and a "Take" quantity per warehouse. A split using the fewest warehouses is
+  pre-filled and can be edited. A pill shows allocated vs. needed (green / amber / red),
+  and Fulfill stays disabled until every item adds up and no warehouse is over-drawn.
 
 ### 9. Suppliers
 - Table: Name, Email, Phone, Address, Status. Edit modal per row.

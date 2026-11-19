@@ -78,7 +78,8 @@ the Java layer is responsible for enforcing.
 - FR21: The system shall check available inventory before confirming an order and reject/flag items that are out of stock.
 - FR22: Confirming/fulfilling an order shall automatically decrease inventory and create a corresponding stock movement record.
 - FR23: The system shall support order statuses: PENDING → CONFIRMED → FULFILLED → CANCELLED.
-- FR24: Cancelling a fulfilled order shall restore inventory (return-to-stock).
+- FR24: Cancelling a fulfilled order shall restore inventory (return-to-stock) to the warehouses the stock was taken from.
+- FR24a: Fulfilling an order shall allow stock to be pulled from one or more warehouses; the quantities allocated for each product must equal the ordered quantity.
 
 ### 3.7 Reporting / Dashboard
 - FR25: The system shall display a dashboard with: total products, low-stock alerts, pending purchase orders, and recent order activity.

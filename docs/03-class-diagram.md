@@ -175,7 +175,7 @@ classDiagram
     class CustomerOrderService {
         +createOrder(customerInfo, items) CustomerOrder
         +confirmOrder(orderId) CustomerOrder
-        +fulfillOrder(orderId) CustomerOrder
+        +fulfillOrder(orderId, allocations) CustomerOrder
         +cancelOrder(orderId) CustomerOrder
     }
 
