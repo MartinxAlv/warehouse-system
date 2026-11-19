@@ -2,7 +2,7 @@
 
 This reflects the core `model` package — the domain entities and how they relate.
 Services (`ProductService`, `InventoryService`, `PurchaseOrderService`,
-`CustomerOrderService`, `UserService`) sit on top of these and contain the business
+`CustomerOrderService`, `AppLogService`) sit on top of these and contain the business
 rules described in the functional requirements.
 
 ```mermaid
@@ -47,6 +47,7 @@ classDiagram
         -String contactEmail
         -String phone
         -String address
+        -boolean active
     }
 
     class ProductSupplier {
@@ -163,7 +164,7 @@ classDiagram
         +adjustStock(productId, warehouseId, delta, reason) InventoryItem
         +transferStock(productId, fromWarehouseId, toWarehouseId, qty) void
         +getLowStockItems() List~InventoryItem~
-        +checkAvailability(productId, qty) boolean
+        +isAvailable(productId, warehouseId, qty) boolean
     }
 
     class PurchaseOrderService {
@@ -176,7 +177,7 @@ classDiagram
         +createOrder(customerInfo, items) CustomerOrder
         +confirmOrder(orderId) CustomerOrder
         +fulfillOrder(orderId, allocations) CustomerOrder
-        +cancelOrder(orderId) CustomerOrder
+        +cancelOrder(orderId, warehouseId) CustomerOrder
     }
 
     User "1" --> "1" Role

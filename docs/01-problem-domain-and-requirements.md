@@ -37,7 +37,7 @@ the Java layer is responsible for enforcing.
 |---|---|
 | **Admin** | Full access: manages users, products, categories, suppliers, warehouses, views all reports |
 | **Warehouse Staff** | Receives purchase orders into a chosen warehouse, records stock adjustments, transfers stock between warehouses, fulfils customer orders |
-| **Sales Staff** | Creates and confirms customer orders, views product availability and inventory levels |
+| **Sales Staff** | Creates, confirms, and fulfils customer orders, views product availability and inventory levels |
 | **Customer** *(optional/stretch)* | Browses products and places orders through a storefront view |
 
 ## 3. Functional Requirements
@@ -45,7 +45,7 @@ the Java layer is responsible for enforcing.
 ### 3.1 Authentication & Users
 - FR1: The system shall allow a user to log in with a username/email and password.
 - FR2: The system shall support role-based access (Admin, Warehouse Staff, Sales Staff).
-- FR3: An Admin shall be able to create, edit, deactivate, and delete user accounts.
+- FR3: An Admin shall be able to create, edit, and deactivate user accounts (including resetting a user's password).
 
 ### 3.2 Product & Category Management
 - FR4: The system shall allow Admins to create, edit, deactivate, and reactivate products.
@@ -55,7 +55,7 @@ the Java layer is responsible for enforcing.
 - FR8: The system shall prevent deleting a product that has existing order or stock history (soft delete / deactivate instead). Deactivated products can be reactivated by an Admin at any time.
 
 ### 3.3 Supplier Management
-- FR9: The system shall allow Admins to create, edit, and deactivate suppliers.
+- FR9: The system shall allow Admins to create and edit suppliers. Suppliers can be deactivated (soft delete) through the API.
 - FR10: The system shall associate products with one or more suppliers.
 
 ### 3.4 Warehouse & Inventory
@@ -71,12 +71,12 @@ the Java layer is responsible for enforcing.
 ### 3.5 Purchase Orders (restocking from suppliers)
 - FR17: The system shall allow Warehouse/Admin staff to create a purchase order for one or more products from a supplier.
 - FR18: The system shall support purchase order statuses: DRAFT → SUBMITTED → PARTIALLY_RECEIVED → RECEIVED → CANCELLED.
-- FR19: Receiving a purchase order (in full or in part) shall automatically increase inventory and create a corresponding stock movement record.
+- FR19: Receiving a purchase order shall automatically increase inventory and create a corresponding stock movement record. The UI receives all outstanding quantities at once; the API also accepts partial receipts (status becomes PARTIALLY_RECEIVED).
 
 ### 3.6 Customer Orders (eCommerce sales side)
-- FR20: The system shall allow Sales Staff to create and confirm customer orders; Warehouse Staff shall be able to mark orders as fulfilled once shipped.
-- FR21: The system shall check available inventory before confirming an order and reject/flag items that are out of stock.
-- FR22: Confirming/fulfilling an order shall automatically decrease inventory and create a corresponding stock movement record.
+- FR20: The system shall allow any authenticated user (Admin, Warehouse Staff, or Sales Staff) to create, confirm, fulfil, and cancel customer orders.
+- FR21: The system shall check total available inventory (across all warehouses) when an order is created and reject it if any item does not have enough stock.
+- FR22: Fulfilling an order shall automatically decrease inventory and create a corresponding stock movement record. Confirming an order does not change inventory.
 - FR23: The system shall support order statuses: PENDING → CONFIRMED → FULFILLED → CANCELLED.
 - FR24: Cancelling a fulfilled order shall restore inventory (return-to-stock) to the warehouses the stock was taken from.
 - FR24a: Fulfilling an order shall allow stock to be pulled from one or more warehouses; the quantities allocated for each product must equal the ordered quantity.
@@ -84,7 +84,7 @@ the Java layer is responsible for enforcing.
 ### 3.7 Reporting / Dashboard
 - FR25: The system shall display a dashboard with: total products, low-stock alerts, pending purchase orders, and recent order activity.
 - FR26: The system shall allow filtering/searching products by name, SKU, category, and stock status.
-- FR27: The system shall provide a stock movement history report, filterable by product, warehouse, and date range.
+- FR27: The system shall provide a stock movement history report, sorted newest first and filterable by product, warehouse, and free-text search.
 
 ### 3.8 System Event Log
 - FR28: The system shall record a log entry whenever a business rule violation occurs (e.g. insufficient stock, invalid order state transition) or an unexpected server error is thrown.

@@ -128,8 +128,10 @@ to maximise screen space.
 - List view with status badges (Draft / Submitted / Received / Cancelled).
 - "New Purchase Order" modal: pick supplier, add line items (product + qty + unit
   cost), submit.
-- Expand a row to see line items and status action buttons. Buttons are disabled/
-  greyed out when not applicable to the current status.
+- Each row has View / Submit / Receive / Cancel buttons. Buttons are disabled/greyed
+  out when not applicable to the current status.
+- **View** opens a detail modal with the supplier, status, and line items (ordered,
+  received, unit cost, subtotal).
 - **Receive modal**: clicking Receive opens a confirmation modal showing all line items
   and quantities being received, plus a warehouse dropdown to choose which warehouse
   the stock is received into. This prevents stock silently landing in the wrong location.
@@ -137,14 +139,18 @@ to maximise screen space.
 ### 8. Customer Orders
 - List view with status badges (Pending / Confirmed / Fulfilled / Cancelled).
 - "New Order" modal: customer name + email, add line items (product + qty).
-- Expand a row to see line items, totals, and status action buttons.
+- Each row has View / Confirm / Fulfill / Cancel buttons, disabled when not applicable
+  to the current status. Cancel is available until an order is cancelled — cancelling
+  a fulfilled order returns its stock to the warehouses it came from.
+- **View** opens a detail modal with customer info, status, total, line items, and the
+  same action buttons.
 - **Fulfill modal**: clicking Fulfill shows each line item with every warehouse's on-hand
   stock and a "Take" quantity per warehouse. A split using the fewest warehouses is
   pre-filled and can be edited. A pill shows allocated vs. needed (green / amber / red),
   and Fulfill stays disabled until every item adds up and no warehouse is over-drawn.
 
 ### 9. Suppliers
-- Table: Name, Email, Phone, Address, Status. Edit modal per row.
+- Table: Name, Contact Email, Phone, Address. Edit modal per row.
 
 ### 10. Warehouses
 - Cards per warehouse showing name and address.
@@ -154,15 +160,16 @@ to maximise screen space.
 ### 11. Reports
 - KPI summary row (same as Dashboard).
 - Stock levels bar chart per product, colour-coded by health (green / amber / red).
-- Purchase order status doughnut chart.
-- Customer order status doughnut chart.
+- Customer order status bar chart.
+- Purchase order status bar chart.
 - Order value summary panel.
 
 ### 12. Categories (Admin only)
-- Table: Name, Description. Add / Edit modal.
+- Table: Name, Description. Add / Edit modal, and Delete per row.
 
 ### 13. Users (Admin only)
-- Table: Name, Email, Role badge, Active status. Add / Edit / Deactivate per row.
+- Table: Name, Email, Role badge, Active status. Add / Edit / Deactivate per row. The
+  Edit modal can also set a new password for the user.
 - **Admin Tools** panel at the bottom: Load Sample Data / Clear All Data buttons with
   a status badge showing whether sample data is currently loaded.
 

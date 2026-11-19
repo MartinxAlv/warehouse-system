@@ -11,7 +11,7 @@ A full-stack warehouse inventory management system built with **Spring Boot** (J
 - Three user roles with different permissions:
   - **Admin** — full access including user management, categories, admin tools, and system log
   - **Warehouse Staff** — inventory operations, purchase orders, stock adjustments, customer order fulfillment
-  - **Sales Staff** — customer orders (create + confirm), read-only inventory and products
+  - **Sales Staff** — customer orders (create, confirm, fulfill), read-only inventory and products
 - Demo accounts pre-seeded on first run
 
 ### Inventory Management
@@ -30,12 +30,14 @@ A full-stack warehouse inventory management system built with **Spring Boot** (J
 ### Purchase Orders (Supplier → Warehouse)
 - Create multi-line purchase orders with multiple products
 - Workflow: Draft → Submitted → Received (or Cancelled)
+- Receiving in the UI receives all outstanding quantities at once (the API also supports partial receipts, which set the order to Partially Received)
 - Receiving a purchase order prompts for a destination warehouse — stock is added to the chosen location
 - Grayed-out action buttons show which steps are available at each stage
 
 ### Customer Orders (Warehouse → Customer)
 - Create orders with multiple line items
 - Workflow: Pending → Confirmed → Fulfilled (or Cancelled)
+- Any role can confirm, fulfill, or cancel an order
 - Fulfilling an order opens a modal to choose which warehouse(s) to pull stock from — an order can be split across multiple warehouses, with a suggested split pre-filled
 - Cancelling a fulfilled order returns stock to the warehouses it came from
 - Date, customer info, and line item breakdown on every order
@@ -165,7 +167,7 @@ The system has three components that must all be running at the same time:
 | Spring Boot backend | `http://localhost:8080` | REST API + business logic |
 | React frontend (Vite) | `http://localhost:5173` | The browser UI |
 
-You will need **three terminal windows** (or tabs) — one for the backend and one for the frontend. MySQL runs in the background.
+You will need **two terminal windows** (or tabs) — one for the backend and one for the frontend. MySQL runs in the background.
 
 ---
 
@@ -229,7 +231,7 @@ mvn spring-boot:run
 
 Wait until you see a line like:
 ```
-Started InventoryApplication in 4.2 seconds
+Started InventoryManagementApplication in 4.2 seconds
 ```
 
 The backend is now running at **http://localhost:8080**. On first boot it automatically creates three demo user accounts.
@@ -445,7 +447,7 @@ The system replaces spreadsheets and manual stock counts with a centralised, rol
 |---|---|---|
 | **Admin** | Store / operations manager | Sets up products, categories, suppliers, warehouses; manages staff accounts; views all reports |
 | **Warehouse Staff** | Warehouse operative | Receives shipments into a chosen warehouse, adjusts stock for damage or miscounts, transfers stock, sets bin locations, prints labels, marks customer orders as fulfilled |
-| **Sales Staff** | Sales rep / customer service | Creates and confirms customer orders, checks stock availability via read-only inventory and products |
+| **Sales Staff** | Sales rep / customer service | Creates, confirms, and fulfills customer orders, checks stock availability via read-only inventory and products |
 
 ---
 
@@ -497,29 +499,47 @@ All endpoints are under `http://localhost:8080/api/`. Protected endpoints requir
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
 | POST | `/auth/login` | Public | Returns JWT token |
+| GET | `/auth/me` | All | Current logged-in user |
+| GET | `/dashboard/summary` | All | Dashboard KPI summary |
 | GET | `/products` | All | List active products |
+| GET | `/products/{id}` | All | Get one product |
 | GET | `/products/all` | Admin | List all products including inactive |
 | POST | `/products` | Admin | Create product |
 | PUT | `/products/{id}` | Admin | Update product |
 | DELETE | `/products/{id}` | Admin | Deactivate product (soft delete) |
 | POST | `/products/{id}/reactivate` | Admin | Reactivate a deactivated product |
+| GET | `/categories` | All | List categories |
+| POST | `/categories` | Admin | Create category |
+| PUT | `/categories/{id}` | Admin | Update category |
+| DELETE | `/categories/{id}` | Admin | Delete category |
+| GET | `/suppliers` | All | List suppliers |
+| POST | `/suppliers` | Admin | Create supplier |
+| PUT | `/suppliers/{id}` | Admin | Update supplier |
+| DELETE | `/suppliers/{id}` | All | Deactivate supplier (soft delete; API only, no UI button) |
+| GET | `/warehouses` | All | List warehouses |
+| POST | `/warehouses` | Admin | Create warehouse |
 | GET | `/inventory` | All | List inventory with bin locations |
+| GET | `/inventory/low-stock` | All | List low-stock inventory lines |
 | POST | `/inventory/adjust` | Admin, Warehouse | Manual stock adjustment |
 | POST | `/inventory/transfer` | Admin, Warehouse | Transfer between warehouses |
 | PATCH | `/inventory/{id}/location` | Admin, Warehouse | Update bin location |
 | GET | `/inventory/movements` | All | Stock movement log |
 | GET | `/purchase-orders` | All | List purchase orders |
+| GET | `/purchase-orders/{id}` | All | Get one purchase order |
 | POST | `/purchase-orders` | Admin, Warehouse | Create purchase order |
 | POST | `/purchase-orders/{id}/submit` | Admin, Warehouse | Submit order to supplier |
 | POST | `/purchase-orders/{id}/receive` | Admin, Warehouse | Receive goods into warehouse |
+| POST | `/purchase-orders/{id}/cancel` | Admin, Warehouse | Cancel purchase order |
 | GET | `/orders` | All | List customer orders |
+| GET | `/orders/{id}` | All | Get one customer order |
 | POST | `/orders` | All | Create customer order |
 | POST | `/orders/{id}/confirm` | All | Confirm order |
 | POST | `/orders/{id}/fulfill` | All | Fulfill order from one or more warehouses (`allocations`: productId, warehouseId, quantity) |
 | POST | `/orders/{id}/cancel` | All | Cancel order (returns stock if already fulfilled) |
 | GET | `/users` | Admin | List users |
 | POST | `/users` | Admin | Create user |
-| PUT | `/users/{id}` | Admin | Update user |
+| PUT | `/users/{id}` | Admin | Update user (name, role, active, password reset) |
+| DELETE | `/users/{id}` | Admin | Deactivate user |
 | PUT | `/profile/password` | All | Change own password |
 | GET | `/admin/sample-data/status` | Admin | Check if sample data is loaded |
 | POST | `/admin/sample-data/seed` | Admin | Load sample data |

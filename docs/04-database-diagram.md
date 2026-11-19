@@ -34,6 +34,7 @@ erDiagram
         varchar contact_email
         varchar phone
         varchar address
+        boolean active
     }
 
     PRODUCT_SUPPLIERS {
